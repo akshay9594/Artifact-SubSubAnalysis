@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "chrono": "cpp",
+        "iostream": "cpp",
+        "*.tcc": "c",
+        "cmath": "c",
+        "random": "c",
+        "assert.h": "c",
+        "algorithm": "c"
+    }
+}
