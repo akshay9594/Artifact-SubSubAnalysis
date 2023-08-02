@@ -49,18 +49,18 @@ wchar_t uses Unicode 10.0.0.  Version 10.0 of the Unicode Standard is
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
- #include <omp.h>
+#include <omp.h>
 #include <sys/time.h>
 #include <math.h>
 #include <assert.h>
 #include "util.h"
-void sddmm_CPU_CSR(int * row_ptr, int * col_ind, double * nnz_val, double * W, double * H, double * p, int n_rows, int k, int nonzeros);
+void sddmm_CPU_CSR(int * col_ptr, int * col_ind, double * nnz_val, double * W, double * H, double * p, int n_rows, int k, int nonzeros);
 /* void Par_sddmm_CPU_CSR(int par_row_ptr, int* col_ind, double* nnz_val, double* W, */
 /*                      double H, double* p,int n_rows ,int k, int nonzeros); */
 int * row_val;
 int * col_val;
 double * nnz_val;
-int * row;
+int * col;
 /* int rowP; */
 int convertStrtoArr(char * str)
 {
@@ -99,36 +99,36 @@ int convertStrtoArr(char * str)
 	return arr;
 }
 
-void sddmm_CPU_CSR(int * row_ptr, int * col_ind, double * nnz_val, double * W, double * H, double * p, int n_rows, int k, int nonzeros)
+void sddmm_CPU_CSR(int * col_ptr, int * row_ind, double * nnz_val, double * W, double * H, double * p, int n_cols, int k, int nonzeros)
 {
 	/* reduction(+:rmse) */
 	int i, r, ind, t, holder;
 	double sm;
 	holder=1;
-	row_ptr[0]=0;
-	r=row_val[0];
+	col_ptr[0]=0;
+	r=col_val[0];
 	#pragma cetus private(i) 
 	#pragma loop name sddmm_CPU_CSR#0 
 	for (i=0; i<nonzeros; i ++ )
 	{
-		if (row_val[i]!=r)
+		if (col_val[i]!=r)
 		{
-			row_ptr[holder ++ ]=i;
+			col_ptr[holder ++ ]=i;
 			/* rowP[holder] = i; */
-			r=row_val[i];
+			r=col_val[i];
 		}
 	}
-	row_ptr[holder]=nonzeros;
+	col_ptr[holder]=nonzeros;
 	/* #pragma omp parallel for private(sm,r,ind,t) */
 	#pragma cetus private(ind, r, sm, t) 
 	#pragma loop name sddmm_CPU_CSR#1 
-	for (r=0; r<n_rows;  ++ r)
+	for (r=0; r<n_cols;  ++ r)
 	{
 		#pragma cetus private(ind, sm, t) 
 		#pragma loop name sddmm_CPU_CSR#1#0 
 		#pragma cetus parallel 
-		#pragma omp parallel for if((10000<((((1L+(5L*row_ptr[(1L+r)]))+(-5L*row_ptr[r]))+((3L*k)*row_ptr[(1L+r)]))+((-3L*k)*row_ptr[r])))) private(ind, sm, t)
-		for (ind=row_ptr[r]; ind<row_ptr[r+1];  ++ ind)
+		#pragma omp parallel for if((10000<((((1L+(5L*col_ptr[(1L+r)]))+(-5L*col_ptr[r]))+((3L*k)*col_ptr[(1L+r)]))+((-3L*k)*col_ptr[r])))) private(ind, sm, t)
+		for (ind=col_ptr[r]; ind<col_ptr[r+1];  ++ ind)
 		{
 			sm=0;
 			#pragma cetus private(t) 
@@ -136,7 +136,7 @@ void sddmm_CPU_CSR(int * row_ptr, int * col_ind, double * nnz_val, double * W, d
 			/* #pragma cetus reduction(+: sm)  */
 			for (t=0; t<k;  ++ t)
 			{
-				sm+=(W[(r*k)+t]*H[(col_ind[ind]*k)+t]);
+				sm+=(W[(r*k)+t]*H[(row_ind[ind]*k)+t]);
 			}
 			p[ind]=(sm*nnz_val[ind]);
 			/* Scaling of non-zero elements of the sparse matrix */
@@ -183,25 +183,19 @@ int main(int argc, char * argv[])
 	char * ptr;
 	char * rowstr = (void * )0;
 	char * temp_str;
-	double seconds, total_time, total_timeP;
+	double seconds, total_time, init_time;
 	double * W;
 	double * H;
 	double * P;
 	double * ParallelP;
 	char delim[] = " ";
-	omp_set_num_threads(4);
-
-    #pragma omp parallel
-    #pragma omp master
-    printf("Max available threads=%d\n", omp_get_max_threads());
-
 	if (argc<2)
 	{
 		printf("Input missing arguments, you need to specify input list file\n");
 	}
 	/* std::string inputMatrix; */
 	/* ,startTT, endTT; */
-	s_factor=3200;
+	s_factor=100;
 	count=0;
 	num_runs=5;
 	fp=fopen(file_path, "r");
@@ -279,10 +273,9 @@ int main(int argc, char * argv[])
 		}
 		i ++ ;
 	}
-	row=malloc(sizeof (int)*(nonzeros+1));
+	col=malloc(sizeof (int)*(nonzeros+1));
 	/* rowP = malloc(sizeof(int)(nonzeros+1)); */
 	total_time=0.0;
-	total_timeP=0.0;
 	W=((double * )malloc(sizeof (double)*((num_rows*s_factor)+s_factor)));
 	H=((double * )malloc(sizeof (double)*((num_cols*s_factor)+s_factor)));
 	P=((double * )malloc(sizeof (double)*(nonzeros+1)));
@@ -295,11 +288,11 @@ int main(int argc, char * argv[])
 	for (k=0; k<num_runs; k ++ )
 	{
 		gettimeofday( & start, (void * )0);
-		sddmm_CPU_CSR(row, col_val, nnz_val, W, H, P, num_rows, s_factor, nonzeros);
+		sddmm_CPU_CSR(col, row_val, nnz_val, W, H, P, num_cols, s_factor, nonzeros);
 		gettimeofday( & end, (void * )0);
 		seconds=((end.tv_sec+(((double)end.tv_usec)/1000000))-(start.tv_sec+(((double)start.tv_usec)/1000000)));
 		total_time+=seconds;
-		gettimeofday( & start, (void * )0);
+		/* gettimeofday(&start,NULL); */
 		/*    Parallel Run */
 		/*   Par_sddmm_CPU_CSR(rowP,col_val,nnz_val,W,H,ParallelP,num_rows,s_factor,nonzeros); */
 		/*   gettimeofday(&end, NULL); */
@@ -307,8 +300,8 @@ int main(int argc, char * argv[])
 		/*   total_timeP+= seconds; */
 	}
 	/* failed = 0; */
-	/* for (int i = 0; i < nonzeros; ++i) { */
-		/*     printf("P[%d]=%f, ParP[%d]=%f\n",i ,P[i], i ,ParallelP[i]); */
+	/* for (i = 0; i < num_rows; ++i) { */
+		/*     printf("P[%d]=%f,\n",i ,P[i]); */
 		/*   if(P[i]-ParallelP[i] > 10e-4) failed=1; */
 	/* } */
 	/* if(failed == 1){ */
@@ -316,7 +309,7 @@ int main(int argc, char * argv[])
 		/*   exit(0); */
 	/* } */
 	printf("Input File Read successfully\n");
-	printf("-->Avg time taken by the Cetus Parallel kernel Without SubSub for %d runs = %f s\n", num_runs, total_time/num_runs);
+	printf("-->Avg time taken by the Cetus Parallel kernel for %d runs = %f s\n", num_runs, total_time/num_runs);
 	/* printf("-->Avg time taken by the Parallel kernel for %d runs = %f s\n", num_runs,total_timePnum_runs); */
 	fclose(fp);
 	if (line)
