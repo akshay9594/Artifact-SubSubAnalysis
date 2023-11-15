@@ -153,10 +153,16 @@ int main(int argc, char *argv[]){
   double* H;
   double* P;
   double* ParallelP;
+  int max_num_threads;
+
+    #pragma omp parallel
+     #pragma omp master
+        max_num_threads = omp_get_num_threads();
+       printf("\nmax_num_threads = %d\n ",max_num_threads );
 
     s_factor = 100;
     count = 0;
-    num_runs = 5;
+    num_runs = 1;
 
     fp = fopen(file_path, "r");
     if (fp == NULL)
@@ -269,7 +275,7 @@ int main(int argc, char *argv[]){
 
    printf("Input File Read successfully\n");
    
-   printf("-->Avg time taken by the serial kernel for %d runs = %f s\n", num_runs,total_time/num_runs);
+   printf("-->Avg time taken by the serial kernel=%f s\n", total_time/num_runs);
    //printf("-->Avg time taken by the Parallel kernel for %d runs = %f s\n", num_runs,total_timeP/num_runs);
 
 

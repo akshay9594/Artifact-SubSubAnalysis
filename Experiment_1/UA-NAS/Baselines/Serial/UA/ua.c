@@ -35,7 +35,7 @@
 
 #include <stdio.h>
 #include <math.h>
-//#include <omp.h>
+#include <omp.h>
 #include "header.h"
 #include "timers.h"
 #include "print_results.h"
@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
   #pragma omp parallel
      #pragma omp master
         max_num_threads = omp_get_num_threads();
-      printf("\nmax_num_threads = %d\n ",max_num_threads );
+       printf("\nmax_num_threads = %d\n ",max_num_threads );
   //---------------------------------------------------------------------
   // Read input file (if it exists), else take
   // defaults from parameters
@@ -429,7 +429,6 @@ int main(int argc, char *argv[])
                 CS6, "(none)");
 
   timeron = false;
-
   
   printf("Transf total Time=%f seconds\n",timer_read(t_transf)+timer_read(t_transf2));
 

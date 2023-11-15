@@ -1009,7 +1009,7 @@ static void com_dpc(int iside, int iel, int enumber, int n, int isize)
 						}
 						else
 						{
-							__assert_fail("0", "precond.c", 685, __PRETTY_FUNCTION__);
+							assert(0);
 						}
 					}));
 					nn1start=0;
@@ -1083,7 +1083,7 @@ static void com_dpc(int iside, int iel, int enumber, int n, int isize)
 							}
 							else
 							{
-								__assert_fail("0", "precond.c", 734, __PRETTY_FUNCTION__);
+								assert(0);
 							}
 						}));
 						anc1=0.0;
