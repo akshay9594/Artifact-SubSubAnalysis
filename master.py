@@ -2,7 +2,7 @@
 
 import os,sys
 
-from ExecScripts import Exp1_Script
+from ExecScripts import Exp1_Script,Exp2_Script
 
 print("\n*************************************************************************\n")
 print("\t\t>Artifact execution for reproducing the results<")
@@ -11,7 +11,7 @@ print("\t\t>Artifact execution for reproducing the results<")
 root = os.getcwd()
 
 print("This experiment measures performance improvement for 3 benchmarks")
-Exp1_Script.RunExp(root)
+Exp2_Script.RunExp(root)
 
 print("\n*************************************************************************\n")
 

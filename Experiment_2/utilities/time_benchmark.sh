@@ -55,8 +55,8 @@ compute_mean_exec_time()
     compvar=`echo "$variance $VARIANCE_ACCEPTED" | awk '{ if ($1 < $2) print "ok"; else print "error"; }'`;
     if [ "$compvar" = "error" ]; then
 	echo "[WARNING] Variance is above thresold, unsafe performance measurement";
-	echo "        => max deviation=$variance%, tolerance=$VARIANCE_ACCEPTED%";
-	WARNING_VARIANCE="$WARNING_VARIANCE\n$benchcomputed: max deviation=$variance%, tolerance=$VARIANCE_ACCEPTED%";
+	echo "        => Maximal deviation from arithmetic mean of 3 average runs: $variance%, tolerance=$VARIANCE_ACCEPTED%";
+	WARNING_VARIANCE="$WARNING_VARIANCE\n$benchcomputed: Maximal deviation from arithmetic mean of 3 average runs: $variance%, tolerance=$VARIANCE_ACCEPTED%";
     else
 	echo "[INFO] Maximal deviation from arithmetic mean of 3 average runs: $variance%";
     fi;
