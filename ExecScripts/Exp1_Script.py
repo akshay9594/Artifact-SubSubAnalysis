@@ -5,18 +5,7 @@ from subprocess import Popen,PIPE
 
 import re,math,os,sys
 
-
-#Calculates run-to-run variation (%)
-def calculate_variation(values_list, mean):
-
-    sum_of_squares = 0.0
-
-    for val in values_list:
-        sum_of_squares += (val - mean)**2 
-
-    standard_dev = math.sqrt(sum_of_squares/len(values_list))
-    percent_dev = (100*standard_dev)/mean 
-    return percent_dev
+import utils
 
 #Executing the AMGmk application
 def execute_amgmk(iters):
@@ -45,7 +34,7 @@ def execute_amgmk(iters):
 
     app_time_avg = app_time_sum/iters
 
-    percent_app_time_var = calculate_variation(app_times,app_time_avg)
+    percent_app_time_var = utils.calculate_variation(app_times,app_time_avg)
 
     return (app_time_avg,percent_app_time_var,threads)
 
@@ -78,7 +67,7 @@ def execute_UA(exec_path,input_class,iters):
    
     mean = transf_time_sum/iters
 
-    percent_var = calculate_variation(transf_times,mean)
+    percent_var = utils.calculate_variation(transf_times,mean)
 
     return (mean,percent_var,threads)
 
@@ -113,7 +102,7 @@ def execute_SDDMM(executable_path,input_path,iters):
 
     app_time_avg = app_time_sum/iters
 
-    percent_app_time_var = calculate_variation(app_times,app_time_avg)
+    percent_app_time_var = utils.calculate_variation(app_times,app_time_avg)
 
     return (app_time_avg,percent_app_time_var,threads)
 
@@ -284,6 +273,8 @@ def run_exp_UA(Exp1_directory,iters,path_to_reports_dir):
 
 
             f.write("\n-------------------------------------------------------------------------------\n")
+
+    return
 
 
 

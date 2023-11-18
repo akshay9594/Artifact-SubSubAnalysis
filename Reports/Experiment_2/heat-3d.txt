@@ -5,8 +5,8 @@
 (b) Optimized Code : Cetus Parallel code (with technique applied)
 
 --------------------------------------------------------------------------
-->Baseline execution time=14.23648133 s (7.979 % variation)
-->Optimized Code execution time =11.03175366 s (6.602 % variation)
-->Speedup=1.2905002929516105
+->Baseline execution time=21.678818 s (0.67 % variation)
+->Optimized Code execution time =10.44624866 s (2.263 % variation)
+->Speedup=2.0752730195874927
 
 -------------------------------------------------------------------------------
