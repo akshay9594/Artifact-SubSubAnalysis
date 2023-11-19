@@ -2,11 +2,16 @@
 ===============Timing Results for the fdtd benchmark(Average of 1 runs)===============
 
 (a) Baseline Code : Serial code
-(b) Optimized Code : Cetus Parallel code (with technique applied)
+(b) Optimized Code : Cetus Parallel code (with the base technique applied)
+                   : Cetus Parallel code (with the new technique applied)
 
 --------------------------------------------------------------------------
-->Baseline execution time=141.05704633 s (1.79 % variation)
-->Optimized Code execution time =32.87943333 s (0.13 % variation)
-->Speedup=4.290130091788902
+->Baseline execution time=150.253341 s (1.966 % variation)
+Execution time of code with Base Technique of [5] =49.34118833 s (9.61 % variation)
+->Base Technique Speedup=3.0451909669278128
+
+Execution time of code with the Technique of this paper =47.14864833 s (1.288 % variation)
+->New Technique Speedup=3.186800604512685
+
 
 -------------------------------------------------------------------------------

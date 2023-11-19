@@ -163,25 +163,31 @@ def run_poly_benchmark(Exp2_directory,benchmark,iters,path_to_reports_dir):
     head_String = "\n===============Timing Results for the fdtd benchmark(Average of "+ str(iters)+" runs)===============\n\n"
 
     #Set the path of the baseline codes
-    base_path = Exp2_directory + benchmark + '/Serial/'
+    baseline_path = Exp2_directory + benchmark + '/Serial/'
 
     #Set the path of the optimized codes
-    opt_code_path = Exp2_directory + benchmark + '/Techniques_Applied/'
+    Base_Opt_code_path = Exp2_directory + benchmark + '/Techniques_Applied/Base_Technique/'
+
+    New_Opt_code_path = Exp2_directory + benchmark + '/Techniques_Applied/New_Technique/'
 
     #Path to benchmark run script
     exec_script = Exp2_directory + 'utilities/./time_benchmark.sh'
 
     #Path to Serial executable
-    serial_executable = base_path + benchmark
+    serial_executable = baseline_path + benchmark
 
-    #Path to Opt executable
-    opt_executable = opt_code_path + benchmark
+    #Path to Opt executables
+    Base_Opt_executable = Base_Opt_code_path + benchmark
+
+    New_Opt_executable = New_Opt_code_path + benchmark
 
     #Compile the baseline code
-    compile_poly(base_path)
+    compile_poly(baseline_path)
 
     #Compile the optimized code
-    compile_poly(opt_code_path)
+    compile_poly(Base_Opt_code_path)
+
+    compile_poly(New_Opt_code_path)
 
     #Change to base Experiment 2 directory
     os.chdir(Exp2_directory)
@@ -189,7 +195,8 @@ def run_poly_benchmark(Exp2_directory,benchmark,iters,path_to_reports_dir):
     with open(path_to_reports_dir+ '/' + benchmark + '.txt', 'w') as f:
         f.write(head_String)
         f.write("(a) Baseline Code : Serial code\n")
-        f.write("(b) Optimized Code : Cetus Parallel code (with technique applied)\n")
+        f.write("(b) Optimized Code : Cetus Parallel code (with the base technique applied)\n")
+        f.write("                   : Cetus Parallel code (with the new technique applied)\n")
 
         f.write("\n--------------------------------------------------------------------------\n")
 
@@ -199,19 +206,30 @@ def run_poly_benchmark(Exp2_directory,benchmark,iters,path_to_reports_dir):
 
         f.write("->Baseline execution time="+ str(app_time)+" s " + "(" + str(app_time_var)+" % variation)\n")
 
-        opt_app_time,opt_app_time_var = execute_poly(exec_script,opt_executable)
+        baseOptCode_time, baseOptCode_var = execute_poly(exec_script,Base_Opt_executable)
 
-        f.write("->Optimized Code execution time ="+ str(opt_app_time)+" s " + "(" + str(opt_app_time_var)+" % variation)\n")
+        f.write("Execution time of code with Base Technique of [5] ="+ str(baseOptCode_time)+" s " + "(" + str(baseOptCode_var)+" % variation)\n")
 
-        app_speedup = app_time/opt_app_time
-        f.write("->Speedup="+str(app_speedup)+"\n")
+        Base_Tech_speedup = app_time/baseOptCode_time
+        f.write("->Base Technique Speedup="+str(Base_Tech_speedup)+"\n\n")
+
+        NewOptCode_time, NewOptCode_var = execute_poly(exec_script,New_Opt_executable)
+
+        f.write("Execution time of code with the Technique of this paper ="+ str(NewOptCode_time)+" s " + "(" + str(NewOptCode_var)+" % variation)\n")
+
+        New_Tech_speedup = app_time/NewOptCode_time
+        f.write("->New Technique Speedup="+str(New_Tech_speedup)+"\n\n")
+
         f.write("\n-------------------------------------------------------------------------------\n")
 
     #Clean the object files
-    os.chdir(base_path)
+    os.chdir(baseline_path)
     Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
 
-    os.chdir(opt_code_path)
+    os.chdir(Base_Opt_code_path)
+    Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
+
+    os.chdir(New_Opt_code_path)
     Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
     
     return
@@ -226,8 +244,9 @@ def run_NAS_benchmark(Exp2_directory,benchmark,iters,path_to_reports_dir,cl,exec
 
     with open(path_to_reports_dir+'/NAS-'+ benchmark +'.txt', 'w') as f:
         f.write(head_String)
-        f.write("(a) Baseline Code : Serial kernel\n")
-        f.write("(b) Optimized Code : Cetus Parallel kernel (with technique applied)\n")
+        f.write("(a) Baseline Code : Serial code\n")
+        f.write("(b) Optimized Code : Cetus Parallel code (with the base technique applied)\n")
+        f.write("                   : Cetus Parallel code (with the new technique applied)\n")
 
         f.write("\n--------------------------------------------------------------------------\n")
 
@@ -253,26 +272,41 @@ def run_NAS_benchmark(Exp2_directory,benchmark,iters,path_to_reports_dir,cl,exec
            
 
         #Set the path of the optimized codes
-        opt_code_path = Exp2_directory+'/'+ benchmark +'-NAS/Techniques_Applied/'
+        Base_Opt_code_path = Exp2_directory+'/'+ benchmark +'-NAS/Techniques_Applied/Base_Technique'
+
+        New_Opt_code_path = Exp2_directory+'/'+ benchmark +'-NAS/Techniques_Applied/New_Technique'
 
         #Compile and execute the optimized code
-        compile_NAS('opt',opt_code_path,benchmark,cl)
-        opt_app_time, opt_time_var = execute_NAS(opt_code_path,exec_command,benchmark,iters)
+        compile_NAS('opt',Base_Opt_code_path,benchmark,cl)
+        compile_NAS('opt',New_Opt_code_path,benchmark,cl)
 
-        f.write("->Optimized Code execution time ="+ str(opt_app_time)+" s " + "(" + str(opt_time_var)+" % variation)\n")
+        baseOptCode_time, baseOptCode_var = execute_NAS(Base_Opt_code_path,exec_command,benchmark,iters)
 
-        app_speedup = app_time/opt_app_time
-        f.write("->Speedup="+str(app_speedup)+"\n")
+        f.write("Execution time of code with Base Technique of [5] ="+ str(baseOptCode_time)+" s " + "(" + str(baseOptCode_var)+" % variation)\n")
 
-        #Clean the object files
-        os.chdir(base_path)
-        Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
+        Base_Tech_speedup = app_time/baseOptCode_time
+        f.write("->Base Technique Speedup="+str(Base_Tech_speedup)+"\n\n")
 
-        os.chdir(opt_code_path)
-        Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
+        #Third, determine execution time and speedup of the Cetus parallel code with the New Technique of this paper applied
+        NewOptCode_time, NewOptCode_var = execute_NAS(New_Opt_code_path,exec_command,benchmark,iters)
 
+        f.write("Execution time of code with the Technique of this paper ="+ str(NewOptCode_time)+" s " + "(" + str(NewOptCode_var)+" % variation)\n")
+
+        New_Tech_speedup = app_time/NewOptCode_time
+        f.write("->New Technique Speedup="+str(New_Tech_speedup)+"\n\n")
 
         f.write("\n-------------------------------------------------------------------------------\n")
+
+    #Clean the object files
+    os.chdir(base_path)
+    Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
+
+    os.chdir(Base_Opt_code_path)
+    Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
+
+    os.chdir(New_Opt_code_path)
+    Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
+        
 
     return
 
@@ -463,13 +497,13 @@ def RunExp(root_directory):
     for tag in benchmark_tags:
         list_benchmarks = benchmarks_dict[tag]
         # if(tag == 'poly'):
-        #     #drive_poly(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
+        #     drive_poly(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
 
-        # if(tag == 'NAS'):
-        #     drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
+        if(tag == 'NAS'):
+            drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
 
-        if(tag == 'Other'):
-            drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
+        # if(tag == 'Other'):
+        #     drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
 
 
     print("Experiment finished and Results written to the Reports directory!!")

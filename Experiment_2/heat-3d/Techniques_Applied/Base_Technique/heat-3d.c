@@ -52,46 +52,36 @@ wchar_t uses Unicode 10.0.0.  Version 10.0 of the Unicode Standard is
  * Web address: http:polybench.sourceforge.net
 
 */
-/* syrk.c: this file is part of PolyBenchC */
+/* heat-3d.c: this file is part of PolyBenchC */
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
 #include <math.h>
 #include <omp.h>
 /* Include polybench common header. */
-#include "../polybench.h"
+#include "../../polybench.h"
 /* Include benchmark-specific header. */
-#include "../syrk.h"
+#include "../../heat-3d.h"
 /* Array initialization. */
-static void init_array(int n, int m, double * alpha, double * beta, double C[(2600+0)][(2600+0)], double A[(2600+0)][(2000+0)])
+static void init_array(int n, double A[(200+0)][(200+0)][(200+0)], double B[(200+0)][(200+0)][(200+0)])
 {
-	int i, j;
-	( * alpha)=1.5;
-	( * beta)=1.2;
-	#pragma cetus private(i, j) 
+	int i, j, k;
+	#pragma cetus private(i, j, k) 
 	#pragma loop name init_array#0 
 	#pragma cetus parallel 
-	#pragma omp parallel for if((10000<((1L+(3L*n))+((3L*m)*n)))) private(i, j)
+	#pragma omp parallel for if((10000<(((1L+(3L*n))+((3L*n)*n))+(((3L*n)*n)*n)))) private(i, j, k)
 	for (i=0; i<n; i ++ )
 	{
-		#pragma cetus private(j) 
+		#pragma cetus private(j, k) 
 		#pragma loop name init_array#0#0 
-		for (j=0; j<m; j ++ )
-		{
-			A[i][j]=(((double)(((i*j)+1)%n))/n);
-		}
-	}
-	#pragma cetus private(i, j) 
-	#pragma loop name init_array#1 
-	#pragma cetus parallel 
-	#pragma omp parallel for if((10000<((1L+(3L*n))+((3L*n)*n)))) private(i, j)
-	for (i=0; i<n; i ++ )
-	{
-		#pragma cetus private(j) 
-		#pragma loop name init_array#1#0 
 		for (j=0; j<n; j ++ )
 		{
-			C[i][j]=(((double)(((i*j)+2)%m))/m);
+			#pragma cetus private(k) 
+			#pragma loop name init_array#0#0#0 
+			for (k=0; k<n; k ++ )
+			{
+				A[i][j][k]=(B[i][j][k]=((((double)((i+j)+(n-k)))*10)/n));
+			}
 		}
 	}
 }
@@ -100,27 +90,32 @@ static void init_array(int n, int m, double * alpha, double * beta, double C[(26
 DCE code. Must scan the entire live-out data.
    Can be used also to check the correctness of the output.
 */
-static void print_array(int n, double C[(2600+0)][(2600+0)])
+static void print_array(int n, double A[(200+0)][(200+0)][(200+0)])
 {
-	int i, j;
+	int i, j, k;
 	fprintf(stderr, "==BEGIN DUMP_ARRAYS==\n");
-	fprintf(stderr, "begin dump: %s", "C");
-	#pragma cetus private(i, j) 
+	fprintf(stderr, "begin dump: %s", "A");
+	#pragma cetus private(i, j, k) 
 	#pragma loop name print_array#0 
 	for (i=0; i<n; i ++ )
 	{
-		#pragma cetus private(j) 
+		#pragma cetus private(j, k) 
 		#pragma loop name print_array#0#0 
 		for (j=0; j<n; j ++ )
 		{
-			if ((((i*n)+j)%20)==0)
+			#pragma cetus private(k) 
+			#pragma loop name print_array#0#0#0 
+			for (k=0; k<n; k ++ )
 			{
-				fprintf(stderr, "\n");
+				if ((((((i*n)*n)+(j*n))+k)%20)==0)
+				{
+					fprintf(stderr, "\n");
+				}
+				fprintf(stderr, "%0.2lf ", A[i][j][k]);
 			}
-			fprintf(stderr, "%0.2lf ", C[i][j]);
 		}
 	}
-	fprintf(stderr, "\nend   dump: %s\n", "C");
+	fprintf(stderr, "\nend   dump: %s\n", "A");
 	fprintf(stderr, "==END   DUMP_ARRAYS==\n");
 }
 
@@ -128,38 +123,48 @@ static void print_array(int n, double C[(2600+0)][(2600+0)])
 Main computational kernel. The whole function will be timed,
    including the call and return.
 */
-static void kernel_syrk(int n, int m, double alpha, double beta, double C[(2600+0)][(2600+0)], double A[(2600+0)][(2000+0)])
+static void kernel_heat_3d(int tsteps, int n, double A[(200+0)][(200+0)][(200+0)], double B[(200+0)][(200+0)][(200+0)])
 {
-	int i, j, k;
-	/* BLAS PARAMS */
-	/* TRANS = 'N' */
-	/* UPLO  = 'L' */
-	/* =>  Form  C := alphaA*A**T + beta*C. */
-	/* A is NxM */
-	/* C is NxN */
+	int t, i, j, k;
 	#pragma scop 
-	#pragma cetus private(i, j, k) 
-	#pragma loop name kernel_syrk#0 
-	#pragma cetus parallel 
-	#pragma omp parallel for private(i, j, k)
-	for (i=0; i<n; i ++ )
+	#pragma cetus private(i, j, k, t) 
+	#pragma loop name kernel_heat_3d#0 
+	for (t=1; t<=1000; t ++ )
 	{
-		#pragma cetus private(j) 
-		#pragma loop name kernel_syrk#0#0 
-		for (j=0; j<=i; j ++ )
+		#pragma cetus private(i, j, k) 
+		#pragma loop name kernel_heat_3d#0#0 
+		#pragma cetus parallel 
+		#pragma omp parallel for if((10000<(((-17L+(27L*n))+((-15L*n)*n))+(((3L*n)*n)*n)))) private(i, j, k)
+		for (i=1; i<(n-1); i ++ )
 		{
-			C[i][j]*=beta;
-		}
-		#pragma cetus private(j, k) 
-		#pragma loop name kernel_syrk#0#1 
-		/* #pragma cetus reduction(+: C[i][j])  */
-		for (k=0; k<m; k ++ )
-		{
-			#pragma cetus private(j) 
-			#pragma loop name kernel_syrk#0#1#0 
-			for (j=0; j<=i; j ++ )
+			#pragma cetus private(j, k) 
+			#pragma loop name kernel_heat_3d#0#0#0 
+			for (j=1; j<(n-1); j ++ )
 			{
-				C[i][j]+=((alpha*A[i][k])*A[j][k]);
+				#pragma cetus private(k) 
+				#pragma loop name kernel_heat_3d#0#0#0#0 
+				for (k=1; k<(n-1); k ++ )
+				{
+					B[i][j][k]=((((0.125*((A[i+1][j][k]-(2.0*A[i][j][k]))+A[i-1][j][k]))+(0.125*((A[i][j+1][k]-(2.0*A[i][j][k]))+A[i][j-1][k])))+(0.125*((A[i][j][k+1]-(2.0*A[i][j][k]))+A[i][j][k-1])))+A[i][j][k]);
+				}
+			}
+		}
+		#pragma cetus private(i, j, k) 
+		#pragma loop name kernel_heat_3d#0#1 
+		#pragma cetus parallel 
+		#pragma omp parallel for if((10000<(((-17L+(27L*n))+((-15L*n)*n))+(((3L*n)*n)*n)))) private(i, j, k)
+		for (i=1; i<(n-1); i ++ )
+		{
+			#pragma cetus private(j, k) 
+			#pragma loop name kernel_heat_3d#0#1#0 
+			for (j=1; j<(n-1); j ++ )
+			{
+				#pragma cetus private(k) 
+				#pragma loop name kernel_heat_3d#0#1#0#0 
+				for (k=1; k<(n-1); k ++ )
+				{
+					A[i][j][k]=((((0.125*((B[i+1][j][k]-(2.0*B[i][j][k]))+B[i-1][j][k]))+(0.125*((B[i][j+1][k]-(2.0*B[i][j][k]))+B[i][j-1][k])))+(0.125*((B[i][j][k+1]-(2.0*B[i][j][k]))+B[i][j][k-1])))+B[i][j][k]);
+				}
 			}
 		}
 	}
@@ -169,41 +174,33 @@ static void kernel_syrk(int n, int m, double alpha, double beta, double C[(2600+
 int main(int argc, char * * argv)
 {
 	/* Retrieve problem size. */
-	int n = 2600;
-	int m = 2000;
+	int n = 200;
+	int tsteps = 1000;
 	/* Variable declarationallocation. */
-	double alpha;
-	double beta;
-	double (* C)[(2600+0)][(2600+0)];
-	double (* A)[(2600+0)][(2000+0)];
-	C=((double (* )[(2600+0)][(2600+0)])polybench_alloc_data((2600+0)*(2600+0), sizeof (double)));
+	double (* A)[(200+0)][(200+0)][(200+0)];
+	double (* B)[(200+0)][(200+0)][(200+0)];
+	A=((double (* )[(200+0)][(200+0)][(200+0)])polybench_alloc_data(((200+0)*(200+0))*(200+0), sizeof (double)));
 	;
-	A=((double (* )[(2600+0)][(2000+0)])polybench_alloc_data((2600+0)*(2000+0), sizeof (double)));
+	B=((double (* )[(200+0)][(200+0)][(200+0)])polybench_alloc_data(((200+0)*(200+0))*(200+0), sizeof (double)));
 	;
 	/* Initialize array(s). */
-	init_array(n, m,  & alpha,  & beta,  * C,  * A);
+	init_array(n,  * A,  * B);
 	/* Start timer. */
-	/* Start timer. */
-  	polybench_start_instruments;
-
+	polybench_start_instruments;
 	/* Run kernel. */
-	kernel_syrk(n, m, alpha, beta,  * C,  * A);
-	/* Stop and print timer. */
+	kernel_heat_3d(tsteps, n,  * A,  * B);
 	/* Stop and print timer. */
 	polybench_stop_instruments;
 	polybench_print_instruments;
-		;
 	/*
 	Prevent dead-code elimination. All live-out data must be printed
 	     by the function call in argument.
 	*/
 	if ((argc>42)&&( ! strcmp(argv[0], "")))
 	{
-		print_array(n,  * C);
+		print_array(n,  * A);
 	}
 	/* Be clean. */
-	free((void * )C);
-	;
 	free((void * )A);
 	;
 	return 0;

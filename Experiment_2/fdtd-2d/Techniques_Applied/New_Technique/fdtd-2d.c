@@ -59,9 +59,9 @@ wchar_t uses Unicode 10.0.0.  Version 10.0 of the Unicode Standard is
 #include <math.h>
 #include <omp.h>
 /* Include polybench common header. */
-#include "../polybench.h"
+#include "../../polybench.h"
 /* Include benchmark-specific header. */
-#include "../fdtd-2d.h"
+#include "../../fdtd-2d.h"
 /* Array initialization. */
 static void init_array(int tmax, int nx, int ny, double ex[(2000+0)][(2600+0)], double ey[(2000+0)][(2600+0)], double hz[(2000+0)][(2600+0)], double _fict_[(1000+0)])
 {
