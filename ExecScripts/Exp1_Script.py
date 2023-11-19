@@ -72,7 +72,7 @@ def execute_UA(exec_path,input_class,iters):
     return (mean,percent_var,threads)
 
 
-#Executing the AMGmk application
+#Executing the SDDMM application
 def execute_SDDMM(executable_path,input_path,iters):
     app_times = []
 
@@ -121,7 +121,7 @@ def compile_amgmk(base_path):
         exit()
     return
 
-
+#Compile the UA benchmark
 def compile_UA(code_type,base_path,input_class):
     os.chdir(base_path)
 
@@ -214,7 +214,7 @@ def run_exp_amgmk(Exp1_directory,iters,path_to_reports_dir):
 
 
 
-#Running the experiment with amgmk benchmark
+#Running the experiment with the UA benchmark
 def run_exp_UA(Exp1_directory,iters,path_to_reports_dir):
 
     #If the user wants to run the experiment for all the input files
@@ -278,7 +278,7 @@ def run_exp_UA(Exp1_directory,iters,path_to_reports_dir):
 
 
 
-#Running the experiment with amgmk benchmark
+#Running the experiment with the SDDMM benchmark
 def run_exp_SDDMM(Exp1_directory,iters,path_to_reports_dir):
 
     #If the user wants to run the experiment for all the input files

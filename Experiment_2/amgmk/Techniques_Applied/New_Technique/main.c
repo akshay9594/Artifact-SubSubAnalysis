@@ -93,8 +93,8 @@ int main(int argc, char * argv[])
 	printf("//   MATVEC\n");
 	printf("// \n");
 	printf("//------------ \n");
-	printf("\nWall time = %f seconds. \n", totalWallTime);
-	printf("Target loop time=%f seconds\n", total_target_loop_time);
+	printf("\nTime taken by kernel= %f s\n", totalWallTime);
+    printf("Target loop time=%f seconds\n", total_target_loop_time);
 	/* Relax */
 	// totalWallTime=0.0;
 	// test_Relax();

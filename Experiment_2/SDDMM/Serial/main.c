@@ -269,7 +269,7 @@ int main(int argc, char *argv[]){
 
    printf("Input File Read successfully\n");
    
-   printf("-->Avg time taken by the serial kernel for %d runs = %f s\n", num_runs,total_time/num_runs);
+   printf("-->Avg time taken by the serial kernel= %f s\n", num_runs,total_time/num_runs);
    //printf("-->Avg time taken by the Parallel kernel for %d runs = %f s\n", num_runs,total_timeP/num_runs);
 
 

@@ -313,7 +313,7 @@ int main(int argc, char * argv[])
 		/*   exit(0); */
 	/* } */
 	printf("Input File Read successfully\n");
-	printf("-->Avg time taken by the Cetus Parallel kernel for %d runs = %f s\n", num_runs, total_time/num_runs);
+	printf("-->Avg time taken by the Cetus Parallel kernel= %f s\n", num_runs, total_time/num_runs);
 	/* printf("-->Avg time taken by the Parallel kernel for %d runs = %f s\n", num_runs,total_timePnum_runs); */
 	fclose(fp);
 	if (line)

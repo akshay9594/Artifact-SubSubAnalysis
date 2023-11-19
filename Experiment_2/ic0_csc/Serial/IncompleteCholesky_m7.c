@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     int num_rows, num_cols, nonzeros, colCnt=0, nnzCnt=0,count=0;
 
     size_t len = 0;
-    ssize_t read;
+    size_t read;
     char matrix_details[100];
 
     fp = fopen(file_path, "r");
@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
 
    }
 
-   printf("Time taken by the Serial kernel for %d runs = %f s\n", num_runs,total_time/num_runs);
+   printf("Time taken by the Serial kernel= %f s\n", num_runs,total_time/num_runs);
 
 
     fclose(fp);

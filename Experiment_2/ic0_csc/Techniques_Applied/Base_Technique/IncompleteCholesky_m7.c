@@ -99,7 +99,7 @@ int main(int argc, char * argv[])
 	char * line = (void * )0;
 	int num_rows, num_cols, nonzeros, colCnt = 0, nnzCnt = 0, count = 0;
 	size_t len = 0;
-	ssize_t read;
+	size_t read;
 	char matrix_details[100];
 	
 	int x, y, col_num = 0;
@@ -286,7 +286,7 @@ int main(int argc, char * argv[])
 		 double seconds = (end.tv_sec + (double)end.tv_usec/1000000) - (start.tv_sec + (double)start.tv_usec/1000000);  
 		 total_time+= seconds; 
 	}
-	printf("Time taken by the Cetus Parallel kernel for %d runs = %f s\n", num_runs, total_time/num_runs);
+	printf("Time taken by the Cetus Parallel kernel= %f s\n", num_runs, total_time/num_runs);
 	fclose(fp);
 	if (line)
 	{
