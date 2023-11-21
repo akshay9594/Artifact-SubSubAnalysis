@@ -125,9 +125,6 @@ int main()
 	char * t_names[10];
 	double tmax;
 	FILE * fp;
-	int i_0;
-	int it_0;
-	int i_1;
 	#pragma cetus private(i) 
 	#pragma loop name main#0 
 	for (i=0; i<10; i ++ )
@@ -321,14 +318,12 @@ int main()
 	timer_stop(0);
 	tinit=timer_read(0);
 	printf(" Initialization time: %15.3f seconds\n\n", tinit);
-	/* Normalized Loop */
-	#pragma cetus lastprivate(i_0) 
+	#pragma cetus private(i) 
 	#pragma loop name main#3 
-	for (i_0=0; i_0<=8; i_0 ++ )
+	for (i=1; i<10; i ++ )
 	{
-		timer_clear(1+i_0);
+		timer_clear(i);
 	}
-	i=(1+i_0);
 	timer_start(1);
 	if (timeron)
 	{
@@ -342,14 +337,13 @@ int main()
 	norm2u3(r, n1, n2, n3,  & rnm2,  & rnmu, nx[lt], ny[lt], nz[lt]);
 	old2=rnm2;
 	oldu=rnmu;
-	/* Normalized Loop */
-	#pragma cetus lastprivate(it_0) 
+	#pragma cetus private(it) 
 	#pragma loop name main#4 
-	for (it_0=0; it_0<=(-1+nit); it_0 ++ )
+	for (it=1; it<=nit; it ++ )
 	{
-		if ((((1+it_0)==1)||((1+it_0)==nit))||(((1+it_0)%5)==0))
+		if (((it==1)||(it==nit))||((it%5)==0))
 		{
-			printf("  iter %3d\n", 1+it_0);
+			printf("  iter %3d\n", it);
 		}
 		if (timeron)
 		{
@@ -370,7 +364,6 @@ int main()
 			timer_stop(5);
 		}
 	}
-	it=(1+it_0);
 	norm2u3(r, n1, n2, n3,  & rnm2,  & rnmu, nx[lt], ny[lt], nz[lt]);
 	timer_stop(1);
 	t=timer_read(1);
@@ -459,7 +452,7 @@ int main()
 	{
 		mflops=0.0;
 	}
-	print_results("MG", Class, nx[lt], ny[lt], nz[lt], nit, t, mflops, "          floating point", verified, "3.3.1", "19 Nov 2023", "gcc", "$(CC)", "-lm", "-I../common", "-g -Wall -O3 -fopenmp -mcmodel=large", "-g -O3 -fopenmp -mcmodel=large", "randdp");
+	print_results("MG", Class, nx[lt], ny[lt], nz[lt], nit, t, mflops, "          floating point", verified, "3.3.1", "20 Jul 2023", "gcc", "$(CC)", "-lm", "-I../common", "-g -Wall -O3 -fopenmp -mcmodel=large", "-g -O3 -fopenmp -mcmodel=large", "randdp");
 	/* --------------------------------------------------------------------- */
 	/* More timers */
 	/* --------------------------------------------------------------------- */
@@ -471,24 +464,21 @@ int main()
 			tmax=1.0;
 		}
 		printf("  SECTION   Time (secs)\n");
-		/* Normalized Loop */
-		#pragma cetus private(t) 
-		#pragma cetus lastprivate(i_1) 
+		#pragma cetus private(i, t) 
 		#pragma loop name main#5 
-		for (i_1=0; i_1<=8; i_1 ++ )
+		for (i=1; i<10; i ++ )
 		{
-			t=timer_read(1+i_1);
-			if ((1+i_1)==5)
+			t=timer_read(i);
+			if (i==5)
 			{
 				t=(timer_read(4)-t);
 				printf("    --> %8s:%9.3f  (%6.2f%%)\n", "mg-resid", t, (t*100.0)/tmax);
 			}
 			else
 			{
-				printf("  %-8s:%9.3f  (%6.2f%%)\n", t_names[1+i_1], t, (t*100.0)/tmax);
+				printf("  %-8s:%9.3f  (%6.2f%%)\n", t_names[i], t, (t*100.0)/tmax);
 			}
 		}
-		i=(1+i_1);
 	}
 	return 0;
 }
@@ -498,18 +488,12 @@ static void setup(int * n1, int * n2, int * n3)
 	int k, j;
 	int ax, mi[((8+1)+1)][3];
 	int ng[((8+1)+1)][3];
-	int k_0;
-	int k_1;
-	int k_2;
-	int j_0;
 	ng[lt][0]=nx[lt];
 	ng[lt][1]=ny[lt];
 	ng[lt][2]=nz[lt];
-	/* Normalized Loop */
-	#pragma cetus private(ax) 
-	#pragma cetus lastprivate(k_0) 
+	#pragma cetus private(ax, k) 
 	#pragma loop name setup#0 
-	for (k_0=0; k_0<=(-2+lt); k_0 ++ )
+	for (k=(lt-1); k>=1; k -- )
 	{
 		#pragma cetus private(ax) 
 		#pragma loop name setup#0#0 
@@ -519,41 +503,35 @@ static void setup(int * n1, int * n2, int * n3)
 		*/
 		for (ax=0; ax<3; ax ++ )
 		{
-			ng[(-1+(-1*k_0))+lt][ax]=(ng[((-1+(-1*k_0))+lt)+1][ax]/2);
+			ng[k][ax]=(ng[k+1][ax]/2);
 		}
 	}
-	k=((-1+(-1*k_0))+lt);
-	/* Normalized Loop */
-	#pragma cetus lastprivate(k_1) 
+	#pragma cetus private(k) 
 	#pragma loop name setup#1 
 	#pragma cetus parallel 
-	#pragma omp parallel for if((10000<(1L+(5L*lt)))) lastprivate(k_1)
-	for (k_1=0; k_1<=(-1+lt); k_1 ++ )
+	#pragma omp parallel for if((10000<(-9L+(5L*lt)))) private(k)
+	for (k=lt; k>=1; k -- )
 	{
-		nx[(-1*k_1)+lt]=ng[(-1*k_1)+lt][0];
-		ny[(-1*k_1)+lt]=ng[(-1*k_1)+lt][1];
-		nz[(-1*k_1)+lt]=ng[(-1*k_1)+lt][2];
+		nx[k]=ng[k][0];
+		ny[k]=ng[k][1];
+		nz[k]=ng[k][2];
 	}
-	k=((-1*k_1)+lt);
-	/* Normalized Loop */
-	#pragma cetus private(ax) 
-	#pragma cetus lastprivate(k_2) 
+	#pragma cetus private(ax, k) 
 	#pragma loop name setup#2 
 	#pragma cetus parallel 
-	#pragma omp parallel for if((10000<(1L+(15L*lt)))) private(ax) lastprivate(k_2)
-	for (k_2=0; k_2<=(-1+lt); k_2 ++ )
+	#pragma omp parallel for if((10000<(-29L+(15L*lt)))) private(ax, k)
+	for (k=lt; k>=1; k -- )
 	{
 		#pragma cetus private(ax) 
 		#pragma loop name setup#2#0 
 		for (ax=0; ax<3; ax ++ )
 		{
-			mi[(-1*k_2)+lt][ax]=(2+ng[(-1*k_2)+lt][ax]);
+			mi[k][ax]=(2+ng[k][ax]);
 		}
-		m1[(-1*k_2)+lt]=mi[(-1*k_2)+lt][0];
-		m2[(-1*k_2)+lt]=mi[(-1*k_2)+lt][1];
-		m3[(-1*k_2)+lt]=mi[(-1*k_2)+lt][2];
+		m1[k]=mi[k][0];
+		m2[k]=mi[k][1];
+		m3[k]=mi[k][2];
 	}
-	k=((-1*k_2)+lt);
 	k=lt;
 	is1=((2+ng[k][0])-ng[lt][0]);
 	ie1=(1+ng[k][0]);
@@ -565,14 +543,12 @@ static void setup(int * n1, int * n2, int * n3)
 	ie3=(1+ng[k][2]);
 	( * n3)=((3+ie3)-is3);
 	ir[lt]=0;
-	/* Normalized Loop */
-	#pragma cetus lastprivate(j_0) 
+	#pragma cetus private(j) 
 	#pragma loop name setup#3 
-	for (j_0=0; j_0<=(-2+lt); j_0 ++ )
+	for (j=(lt-1); j>=1; j -- )
 	{
-		ir[(-1+(-1*j_0))+lt]=(ir[((-1+(-1*j_0))+lt)+1]+(((1*m1[((-1+(-1*j_0))+lt)+1])*m2[((-1+(-1*j_0))+lt)+1])*m3[((-1+(-1*j_0))+lt)+1]));
+		ir[j]=(ir[j+1]+(((1*m1[j+1])*m2[j+1])*m3[j+1]));
 	}
-	j=((-1+(-1*j_0))+lt);
 	if (debug_vec[1]>=1)
 	{
 		printf(" in setup, \n");
@@ -591,46 +567,38 @@ static void mg3P(double u[], double v[], double r[], double a[4], double c[4], i
 	/* down cycle. */
 	/* restrict the residual from the find grid to the coarse */
 	/* --------------------------------------------------------------------- */
-	int k_0;
-	int k_1;
-	/* Normalized Loop */
-	#pragma cetus private(j) 
-	#pragma cetus lastprivate(k_0) 
+	#pragma cetus private(j, k) 
 	#pragma loop name mg3P#0 
-	for (k_0=0; k_0<=((-1+(-1*lb))+lt); k_0 ++ )
+	for (k=lt; k>=(lb+1); k -- )
 	{
-		j=(((-1*k_0)+lt)-1);
-		rprj3( & r[ir[(-1*k_0)+lt]], m1[(-1*k_0)+lt], m2[(-1*k_0)+lt], m3[(-1*k_0)+lt],  & r[ir[j]], m1[j], m2[j], m3[j], (-1*k_0)+lt);
+		j=(k-1);
+		rprj3( & r[ir[k]], m1[k], m2[k], m3[k],  & r[ir[j]], m1[j], m2[j], m3[j], k);
 	}
-	k=((-1*k_0)+lt);
 	k=lb;
 	/* --------------------------------------------------------------------- */
 	/* compute an approximate solution on the coarsest grid */
 	/* --------------------------------------------------------------------- */
 	zero3( & u[ir[k]], m1[k], m2[k], m3[k]);
 	psinv( & r[ir[k]],  & u[ir[k]], m1[k], m2[k], m3[k], c, k);
-	/* Normalized Loop */
-	#pragma cetus private(j) 
-	#pragma cetus lastprivate(k_1) 
+	#pragma cetus private(j, k) 
 	#pragma loop name mg3P#1 
-	for (k_1=0; k_1<=((-2+(-1*lb))+lt); k_1 ++ )
+	for (k=(lb+1); k<=(lt-1); k ++ )
 	{
-		j=(((1+k_1)+lb)-1);
+		j=(k-1);
 		/* --------------------------------------------------------------------- */
 		/* prolongate from level k-1  to k */
 		/* --------------------------------------------------------------------- */
-		zero3( & u[ir[(1+k_1)+lb]], m1[(1+k_1)+lb], m2[(1+k_1)+lb], m3[(1+k_1)+lb]);
-		interp( & u[ir[j]], m1[j], m2[j], m3[j],  & u[ir[(1+k_1)+lb]], m1[(1+k_1)+lb], m2[(1+k_1)+lb], m3[(1+k_1)+lb], (1+k_1)+lb);
+		zero3( & u[ir[k]], m1[k], m2[k], m3[k]);
+		interp( & u[ir[j]], m1[j], m2[j], m3[j],  & u[ir[k]], m1[k], m2[k], m3[k], k);
 		/* --------------------------------------------------------------------- */
 		/* compute residual for level k */
 		/* --------------------------------------------------------------------- */
-		resid( & u[ir[(1+k_1)+lb]],  & r[ir[(1+k_1)+lb]],  & r[ir[(1+k_1)+lb]], m1[(1+k_1)+lb], m2[(1+k_1)+lb], m3[(1+k_1)+lb], a, (1+k_1)+lb);
+		resid( & u[ir[k]],  & r[ir[k]],  & r[ir[k]], m1[k], m2[k], m3[k], a, k);
 		/* --------------------------------------------------------------------- */
 		/* apply smoother */
 		/* --------------------------------------------------------------------- */
-		psinv( & r[ir[(1+k_1)+lb]],  & u[ir[(1+k_1)+lb]], m1[(1+k_1)+lb], m2[(1+k_1)+lb], m3[(1+k_1)+lb], c, (1+k_1)+lb);
+		psinv( & r[ir[k]],  & u[ir[k]], m1[k], m2[k], m3[k], c, k);
 	}
-	k=((1+k_1)+lb);
 	j=(lt-1);
 	k=lt;
 	interp( & u[ir[j]], m1[j], m2[j], m3[j], u, n1, n2, n3, k);
@@ -655,85 +623,41 @@ static void psinv(void * or, void * ou, int n1, int n2, int n3, double c[4], int
 	double (* u)[n2][n1] = (double (* )[n2][n1])ou;
 	int i3, i2, i1;
 	double r1[((2+(1<<8))+1)], r2[((2+(1<<8))+1)];
-	int i3_0;
-	int i2_0;
-	int i1_0;
 	if (timeron)
 	{
 		timer_start(3);
 	}
+	#pragma cetus private(i1, i2, i3, r1, r2) 
+	#pragma loop name psinv#0 
 	#pragma cetus parallel 
-	#pragma cetus private(i1, i1_0, i2, i2_0, r1, r2) 
-	#pragma omp parallel if((10000<(((((((89L+(34L*n1))+(2L*n2))+(12L*n3))+((-20L*n1)*n2))+((-20L*n1)*n3))+((-1L*n2)*n3))+(((13L*n1)*n2)*n3)))) private(i1, i1_0, i2, i2_0, r1, r2)
+	#pragma omp parallel for if((10000<(((((((-13L+(28L*n1))+(4L*n2))+(7L*n3))+((-14L*n1)*n2))+((-14L*n1)*n3))+((-2L*n2)*n3))+(((7L*n1)*n2)*n3)))) private(i1, i2, i3, r1, r2)
+	for (i3=1; i3<(n3-1); i3 ++ )
 	{
-		double (* reduce0)[(-1+n2)][(-1+n1)] = (double (* )[(-1+n2)][(-1+n1)])malloc((((((((-1+n1)+n2)+n3)+((-1*n1)*n2))+((-1*n1)*n3))+((-1*n2)*n3))+((n1*n2)*n3))*sizeof (double));
-		int reduce_span_0;
-		int reduce_span_1;
-		int reduce_span_2;
-		for (reduce_span_0=0; reduce_span_0<(-1+n3); reduce_span_0 ++ )
+		#pragma cetus private(i1, i2) 
+		#pragma cetus lastprivate(r1, r2) 
+		#pragma loop name psinv#0#0 
+		for (i2=1; i2<(n2-1); i2 ++ )
 		{
-			for (reduce_span_1=0; reduce_span_1<(-1+n2); reduce_span_1 ++ )
+			#pragma cetus private(i1) 
+			#pragma loop name psinv#0#0#0 
+			for (i1=0; i1<n1; i1 ++ )
 			{
-				for (reduce_span_2=0; reduce_span_2<(-1+n1); reduce_span_2 ++ )
-				{
-					reduce0[reduce_span_0][reduce_span_1][reduce_span_2]=0;
-				}
+				r1[i1]=(((r[i3][i2-1][i1]+r[i3][i2+1][i1])+r[i3-1][i2][i1])+r[i3+1][i2][i1]);
+				r2[i1]=(((r[i3-1][i2-1][i1]+r[i3-1][i2+1][i1])+r[i3+1][i2-1][i1])+r[i3+1][i2+1][i1]);
 			}
-		}
-		/* Normalized Loop */
-		#pragma cetus lastprivate(i3_0) 
-		#pragma loop name psinv#0 
-		#pragma cetus for  
-		#pragma omp for lastprivate(i3_0)
-		for (i3_0=0; i3_0<=(-3+n3); i3_0 ++ )
-		{
-			/* Normalized Loop */
-			#pragma cetus private(i1, i1_0) 
-			#pragma cetus lastprivate(i2_0, r1, r2) 
-			#pragma loop name psinv#0#0 
-			/* #pragma cetus reduction(+: u[(1+i3_0)][(1+i2_0)][(1+i1_0)])  */
-			for (i2_0=0; i2_0<=(-3+n2); i2_0 ++ )
+			#pragma cetus private(i1) 
+			#pragma loop name psinv#0#0#1 
+			for (i1=1; i1<(n1-1); i1 ++ )
 			{
-				#pragma cetus private(i1) 
-				#pragma loop name psinv#0#0#0 
-				for (i1=0; i1<n1; i1 ++ )
-				{
-					r1[i1]=(((r[1+i3_0][(1+i2_0)-1][i1]+r[1+i3_0][(1+i2_0)+1][i1])+r[(1+i3_0)-1][1+i2_0][i1])+r[(1+i3_0)+1][1+i2_0][i1]);
-					r2[i1]=(((r[(1+i3_0)-1][(1+i2_0)-1][i1]+r[(1+i3_0)-1][(1+i2_0)+1][i1])+r[(1+i3_0)+1][(1+i2_0)-1][i1])+r[(1+i3_0)+1][(1+i2_0)+1][i1]);
-				}
-				/* Normalized Loop */
-				#pragma cetus lastprivate(i1_0) 
-				#pragma loop name psinv#0#0#1 
-				/* #pragma cetus reduction(+: u[(1+i3_0)][(1+i2_0)][(1+i1_0)])  */
-				for (i1_0=0; i1_0<=(-3+n1); i1_0 ++ )
-				{
-					reduce0[1+i3_0][1+i2_0][1+i1_0]=(((reduce0[1+i3_0][1+i2_0][1+i1_0]+(c[0]*r[1+i3_0][1+i2_0][1+i1_0]))+(c[1]*((r[1+i3_0][1+i2_0][(1+i1_0)-1]+r[1+i3_0][1+i2_0][(1+i1_0)+1])+r1[1+i1_0])))+(c[2]*((r2[1+i1_0]+r1[(1+i1_0)-1])+r1[(1+i1_0)+1])));
-					/* -------------------------------------------------------------------- */
-					/* Assume c[3] = 0    (Enable line below if c[3] not= 0) */
-					/* -------------------------------------------------------------------- */
-					/*            + c[3] ( r2[i1-1] + r2[i1+1] ) */
-					/* -------------------------------------------------------------------- */
-				}
-				i1=(1+i1_0);
-			}
-			i2=(1+i2_0);
-		}
-		#pragma cetus critical  
-		#pragma omp critical
-		{
-			for (reduce_span_0=0; reduce_span_0<(-1+n3); reduce_span_0 ++ )
-			{
-				for (reduce_span_1=0; reduce_span_1<(-1+n2); reduce_span_1 ++ )
-				{
-					for (reduce_span_2=0; reduce_span_2<(-1+n1); reduce_span_2 ++ )
-					{
-						u[reduce_span_0][reduce_span_1][reduce_span_2]+=reduce0[reduce_span_0][reduce_span_1][reduce_span_2];
-					}
-				}
+				u[i3][i2][i1]=(((u[i3][i2][i1]+(c[0]*r[i3][i2][i1]))+(c[1]*((r[i3][i2][i1-1]+r[i3][i2][i1+1])+r1[i1])))+(c[2]*((r2[i1]+r1[i1-1])+r1[i1+1])));
+				/* -------------------------------------------------------------------- */
+				/* Assume c[3] = 0    (Enable line below if c[3] not= 0) */
+				/* -------------------------------------------------------------------- */
+				/*            + c[3] ( r2[i1-1] + r2[i1+1] ) */
+				/* -------------------------------------------------------------------- */
 			}
 		}
 	}
-	i3=(1+i3_0);
 	if (timeron)
 	{
 		timer_stop(3);
@@ -771,38 +695,31 @@ static void resid(void * ou, void * ov, void * or, int n1, int n2, int n3, doubl
 	double (* r)[n2][n1] = (double (* )[n2][n1])or;
 	int i3, i2, i1;
 	double u1[((2+(1<<8))+1)], u2[((2+(1<<8))+1)];
-	int i3_0;
-	int i2_0;
-	int i1_0;
 	if (timeron)
 	{
 		timer_start(4);
 	}
-	/* Normalized Loop */
-	#pragma cetus private(i1, i1_0, i2, i2_0, u1, u2) 
-	#pragma cetus lastprivate(i3_0) 
+	#pragma cetus private(i1, i2, i3, u1, u2) 
 	#pragma loop name resid#0 
 	#pragma cetus parallel 
-	#pragma omp parallel for if((10000<(((((((-11L+(28L*n1))+(2L*n2))+(6L*n3))+((-14L*n1)*n2))+((-14L*n1)*n3))+((-1L*n2)*n3))+(((7L*n1)*n2)*n3)))) private(i1, i1_0, i2, i2_0, u1, u2) lastprivate(i3_0)
-	for (i3_0=0; i3_0<=(-3+n3); i3_0 ++ )
+	#pragma omp parallel for if((10000<(((((((-13L+(28L*n1))+(4L*n2))+(7L*n3))+((-14L*n1)*n2))+((-14L*n1)*n3))+((-2L*n2)*n3))+(((7L*n1)*n2)*n3)))) private(i1, i2, i3, u1, u2)
+	for (i3=1; i3<(n3-1); i3 ++ )
 	{
-		/* Normalized Loop */
-		#pragma cetus private(i1, i1_0) 
-		#pragma cetus lastprivate(i2_0, u1, u2) 
+		#pragma cetus private(i1, i2) 
+		#pragma cetus lastprivate(u1, u2) 
 		#pragma loop name resid#0#0 
-		for (i2_0=0; i2_0<=(-3+n2); i2_0 ++ )
+		for (i2=1; i2<(n2-1); i2 ++ )
 		{
 			#pragma cetus private(i1) 
 			#pragma loop name resid#0#0#0 
 			for (i1=0; i1<n1; i1 ++ )
 			{
-				u1[i1]=(((u[1+i3_0][(1+i2_0)-1][i1]+u[1+i3_0][(1+i2_0)+1][i1])+u[(1+i3_0)-1][1+i2_0][i1])+u[(1+i3_0)+1][1+i2_0][i1]);
-				u2[i1]=(((u[(1+i3_0)-1][(1+i2_0)-1][i1]+u[(1+i3_0)-1][(1+i2_0)+1][i1])+u[(1+i3_0)+1][(1+i2_0)-1][i1])+u[(1+i3_0)+1][(1+i2_0)+1][i1]);
+				u1[i1]=(((u[i3][i2-1][i1]+u[i3][i2+1][i1])+u[i3-1][i2][i1])+u[i3+1][i2][i1]);
+				u2[i1]=(((u[i3-1][i2-1][i1]+u[i3-1][i2+1][i1])+u[i3+1][i2-1][i1])+u[i3+1][i2+1][i1]);
 			}
-			/* Normalized Loop */
-			#pragma cetus lastprivate(i1_0) 
+			#pragma cetus private(i1) 
 			#pragma loop name resid#0#0#1 
-			for (i1_0=0; i1_0<=(-3+n1); i1_0 ++ )
+			for (i1=1; i1<(n1-1); i1 ++ )
 			{
 				/* ------------------------------------------------------------------- */
 				/*  Assume a[1] = 0      (Enable 2 lines below if a[1] not= 0) */
@@ -810,13 +727,10 @@ static void resid(void * ou, void * ov, void * or, int n1, int n2, int n3, doubl
 				/*            - a[1] ( u[i3][i2][i1-1] + u[i3][i2][i1+1] */
 				/*                     + u1[i1] ) */
 				/* ------------------------------------------------------------------- */
-				r[1+i3_0][1+i2_0][1+i1_0]=(((v[1+i3_0][1+i2_0][1+i1_0]-(a[0]*u[1+i3_0][1+i2_0][1+i1_0]))-(a[2]*((u2[1+i1_0]+u1[(1+i1_0)-1])+u1[(1+i1_0)+1])))-(a[3]*(u2[(1+i1_0)-1]+u2[(1+i1_0)+1])));
+				r[i3][i2][i1]=(((v[i3][i2][i1]-(a[0]*u[i3][i2][i1]))-(a[2]*((u2[i1]+u1[i1-1])+u1[i1+1])))-(a[3]*(u2[i1-1]+u2[i1+1])));
 			}
-			i1=(1+i1_0);
 		}
-		i2=(1+i2_0);
 	}
-	i3=(1+i3_0);
 	if (timeron)
 	{
 		timer_stop(4);
@@ -850,10 +764,6 @@ static void rprj3(void * or, int m1k, int m2k, int m3k, void * os, int m1j, int 
 	double (* s)[m2j][m1j] = (double (* )[m2j][m1j])os;
 	int j3, j2, j1, i3, i2, i1, d1, d2, d3, j;
 	double x1[((2+(1<<8))+1)], y1[((2+(1<<8))+1)], x2, y2;
-	int j3_0;
-	int j2_0;
-	int j1_0;
-	int j1_1;
 	if (timeron)
 	{
 		timer_start(6);
@@ -882,51 +792,39 @@ static void rprj3(void * or, int m1k, int m2k, int m3k, void * os, int m1j, int 
 	{
 		d3=1;
 	}
-	/* Normalized Loop */
-	#pragma cetus private(i1, i2, i3, j1, j1_0, j1_1, j2, j2_0, x2, y2) 
-	#pragma cetus lastprivate(j3_0) 
+	#pragma cetus private(i1, i2, i3, j1, j2, j3, x2, y2) 
 	#pragma loop name rprj3#0 
-	for (j3_0=0; j3_0<=(-3+m3j); j3_0 ++ )
+	for (j3=1; j3<(m3j-1); j3 ++ )
 	{
-		i3=((2*(1+j3_0))-d3);
-		/* Normalized Loop */
-		#pragma cetus private(i1, i2, j1, j1_0, j1_1, x2, y2) 
-		#pragma cetus lastprivate(j2_0) 
+		i3=((2*j3)-d3);
+		#pragma cetus private(i1, i2, j1, j2, x2, y2) 
 		#pragma loop name rprj3#0#0 
-		for (j2_0=0; j2_0<=(-3+m2j); j2_0 ++ )
+		for (j2=1; j2<(m2j-1); j2 ++ )
 		{
-			i2=((2*(1+j2_0))-d2);
-			/* Normalized Loop */
-			#pragma cetus private(i1) 
-			#pragma cetus lastprivate(j1_0) 
+			i2=((2*j2)-d2);
+			#pragma cetus private(i1, j1) 
 			#pragma loop name rprj3#0#0#0 
 			#pragma cetus parallel 
-			#pragma omp parallel for if((10000<(-4L+(5L*m1j)))) private(i1) lastprivate(j1_0)
-			for (j1_0=0; j1_0<=(-2+m1j); j1_0 ++ )
+			#pragma omp parallel for if((10000<(-4L+(5L*m1j)))) private(i1, j1)
+			for (j1=1; j1<m1j; j1 ++ )
 			{
-				i1=((2*(1+j1_0))-d1);
+				i1=((2*j1)-d1);
 				x1[i1]=(((r[i3+1][i2][i1]+r[i3+1][i2+2][i1])+r[i3][i2+1][i1])+r[i3+2][i2+1][i1]);
 				y1[i1]=(((r[i3][i2][i1]+r[i3+2][i2][i1])+r[i3][i2+2][i1])+r[i3+2][i2+2][i1]);
 			}
-			j1=(1+j1_0);
-			/* Normalized Loop */
-			#pragma cetus private(i1, x2, y2) 
-			#pragma cetus lastprivate(j1_1) 
+			#pragma cetus private(i1, j1, x2, y2) 
 			#pragma loop name rprj3#0#0#1 
 			#pragma cetus parallel 
-			#pragma omp parallel for if((10000<(-11L+(6L*m1j)))) private(i1, x2, y2) lastprivate(j1_1)
-			for (j1_1=0; j1_1<=(-3+m1j); j1_1 ++ )
+			#pragma omp parallel for if((10000<(-11L+(6L*m1j)))) private(i1, j1, x2, y2)
+			for (j1=1; j1<(m1j-1); j1 ++ )
 			{
-				i1=((2*(1+j1_1))-d1);
+				i1=((2*j1)-d1);
 				y2=(((r[i3][i2][i1+1]+r[i3+2][i2][i1+1])+r[i3][i2+2][i1+1])+r[i3+2][i2+2][i1+1]);
 				x2=(((r[i3+1][i2][i1+1]+r[i3+1][i2+2][i1+1])+r[i3][i2+1][i1+1])+r[i3+2][i2+1][i1+1]);
-				s[1+j3_0][1+j2_0][1+j1_1]=((((0.5*r[i3+1][i2+1][i1+1])+(0.25*((r[i3+1][i2+1][i1]+r[i3+1][i2+1][i1+2])+x2)))+(0.125*((x1[i1]+x1[i1+2])+y2)))+(0.0625*(y1[i1]+y1[i1+2])));
+				s[j3][j2][j1]=((((0.5*r[i3+1][i2+1][i1+1])+(0.25*((r[i3+1][i2+1][i1]+r[i3+1][i2+1][i1+2])+x2)))+(0.125*((x1[i1]+x1[i1+2])+y2)))+(0.0625*(y1[i1]+y1[i1+2])));
 			}
-			j1=(1+j1_1);
 		}
-		j2=(1+j2_0);
 	}
-	j3=(1+j3_0);
 	if (timeron)
 	{
 		timer_stop(6);
@@ -963,20 +861,6 @@ static void interp(void * oz, int mm1, int mm2, int mm3, void * ou, int n1, int 
 	/*      integer m */
 	/*      parameter( m=535 ) */
 	double z1[((2+(1<<8))+1)], z2[((2+(1<<8))+1)], z3[((2+(1<<8))+1)];
-	int i3_0;
-	int i2_0;
-	int i1_0;
-	int i1_1;
-	int i2_1;
-	int i1_2;
-	int i1_3;
-	int i3_1;
-	int i2_2;
-	int i1_4;
-	int i1_5;
-	int i2_3;
-	int i1_6;
-	int i1_7;
 	if (timeron)
 	{
 		timer_start(7);
@@ -1065,122 +949,88 @@ static void interp(void * oz, int mm1, int mm2, int mm3, void * ou, int n1, int 
 			d3=1;
 			t3=0;
 		}
-		/* Normalized Loop */
-		#pragma cetus private(i1, i1_0, i1_1, i1_2, i1_3, i2, i2_0, i2_1) 
-		#pragma cetus lastprivate(i3_0) 
+		#pragma cetus private(i1, i2, i3) 
 		#pragma loop name interp#1 
 		#pragma cetus parallel 
-		#pragma omp parallel for if((10000<((((((((((((((((((1L+(-3L*d3))+(3L*mm3))+((-3L*d1)*d3))+((3L*d1)*mm3))+((3L*d2)*d3))+((-3L*d2)*mm3))+((6L*d3)*mm1))+((-6L*d3)*mm2))+((-6L*mm1)*mm3))+((6L*mm2)*mm3))+(((-3L*d1)*d2)*d3))+(((3L*d1)*d2)*mm3))+(((6L*d1)*d3)*mm2))+(((-6L*d1)*mm2)*mm3))+(((6L*d2)*d3)*mm1))+(((-6L*d2)*mm1)*mm3))+(((-12L*d3)*mm1)*mm2))+(((12L*mm1)*mm2)*mm3)))) private(i1, i1_0, i1_1, i1_2, i1_3, i2, i2_0, i2_1) lastprivate(i3_0)
-		for (i3_0=0; i3_0<=((-1+(-1*d3))+mm3); i3_0 ++ )
+		#pragma omp parallel for if((10000<((((((((((((((((((1L+(-3L*d3))+(3L*mm3))+((-3L*d1)*d3))+((3L*d1)*mm3))+(d2*d3))+((-1L*d2)*mm3))+((6L*d3)*mm1))+((-2L*d3)*mm2))+((-6L*mm1)*mm3))+((2L*mm2)*mm3))+(((-3L*d1)*d2)*d3))+(((3L*d1)*d2)*mm3))+(((6L*d1)*d3)*mm2))+(((-6L*d1)*mm2)*mm3))+(((6L*d2)*d3)*mm1))+(((-6L*d2)*mm1)*mm3))+(((-12L*d3)*mm1)*mm2))+(((12L*mm1)*mm2)*mm3)))) private(i1, i2, i3)
+		for (i3=d3; i3<=(mm3-1); i3 ++ )
 		{
-			/* Normalized Loop */
-			#pragma cetus private(i1, i1_0, i1_1) 
-			#pragma cetus lastprivate(i2_0) 
+			#pragma cetus private(i1, i2) 
 			#pragma loop name interp#1#0 
-			for (i2_0=0; i2_0<=((-1+(-1*d2))+mm2); i2_0 ++ )
+			for (i2=d2; i2<=(mm2-1); i2 ++ )
 			{
-				/* Normalized Loop */
-				#pragma cetus lastprivate(i1_0) 
+				#pragma cetus private(i1) 
 				#pragma loop name interp#1#0#0 
-				for (i1_0=0; i1_0<=((-1+(-1*d1))+mm1); i1_0 ++ )
+				for (i1=d1; i1<=(mm1-1); i1 ++ )
 				{
-					u[((2*(d3+i3_0))-d3)-1][((2*(d2+i2_0))-d2)-1][((2*(d1+i1_0))-d1)-1]=(u[((2*(d3+i3_0))-d3)-1][((2*(d2+i2_0))-d2)-1][((2*(d1+i1_0))-d1)-1]+z[(d3+i3_0)-1][(d2+i2_0)-1][(d1+i1_0)-1]);
+					u[((2*i3)-d3)-1][((2*i2)-d2)-1][((2*i1)-d1)-1]=(u[((2*i3)-d3)-1][((2*i2)-d2)-1][((2*i1)-d1)-1]+z[i3-1][i2-1][i1-1]);
 				}
-				i1=(d1+i1_0);
-				/* Normalized Loop */
-				#pragma cetus lastprivate(i1_1) 
+				#pragma cetus private(i1) 
 				#pragma loop name interp#1#0#1 
-				for (i1_1=0; i1_1<=(-2+mm1); i1_1 ++ )
+				for (i1=1; i1<=(mm1-1); i1 ++ )
 				{
-					u[((2*(d3+i3_0))-d3)-1][((2*(d2+i2_0))-d2)-1][((2*(1+i1_1))-t1)-1]=(u[((2*(d3+i3_0))-d3)-1][((2*(d2+i2_0))-d2)-1][((2*(1+i1_1))-t1)-1]+(0.5*(z[(d3+i3_0)-1][(d2+i2_0)-1][1+i1_1]+z[(d3+i3_0)-1][(d2+i2_0)-1][(1+i1_1)-1])));
+					u[((2*i3)-d3)-1][((2*i2)-d2)-1][((2*i1)-t1)-1]=(u[((2*i3)-d3)-1][((2*i2)-d2)-1][((2*i1)-t1)-1]+(0.5*(z[i3-1][i2-1][i1]+z[i3-1][i2-1][i1-1])));
 				}
-				i1=(1+i1_1);
 			}
-			i2=(d2+i2_0);
-			/* Normalized Loop */
-			#pragma cetus private(i1, i1_2, i1_3) 
-			#pragma cetus lastprivate(i2_1) 
+			#pragma cetus private(i1, i2) 
 			#pragma loop name interp#1#1 
-			for (i2_1=0; i2_1<=(-2+mm2); i2_1 ++ )
+			for (i2=1; i2<=(mm2-1); i2 ++ )
 			{
-				/* Normalized Loop */
-				#pragma cetus lastprivate(i1_2) 
+				#pragma cetus private(i1) 
 				#pragma loop name interp#1#1#0 
-				for (i1_2=0; i1_2<=((-1+(-1*d1))+mm1); i1_2 ++ )
+				for (i1=d1; i1<=(mm1-1); i1 ++ )
 				{
-					u[((2*(d3+i3_0))-d3)-1][((2*(1+i2_1))-t2)-1][((2*(d1+i1_2))-d1)-1]=(u[((2*(d3+i3_0))-d3)-1][((2*(1+i2_1))-t2)-1][((2*(d1+i1_2))-d1)-1]+(0.5*(z[(d3+i3_0)-1][1+i2_1][(d1+i1_2)-1]+z[(d3+i3_0)-1][(1+i2_1)-1][(d1+i1_2)-1])));
+					u[((2*i3)-d3)-1][((2*i2)-t2)-1][((2*i1)-d1)-1]=(u[((2*i3)-d3)-1][((2*i2)-t2)-1][((2*i1)-d1)-1]+(0.5*(z[i3-1][i2][i1-1]+z[i3-1][i2-1][i1-1])));
 				}
-				i1=(d1+i1_2);
-				/* Normalized Loop */
-				#pragma cetus lastprivate(i1_3) 
+				#pragma cetus private(i1) 
 				#pragma loop name interp#1#1#1 
-				for (i1_3=0; i1_3<=(-2+mm1); i1_3 ++ )
+				for (i1=1; i1<=(mm1-1); i1 ++ )
 				{
-					u[((2*(d3+i3_0))-d3)-1][((2*(1+i2_1))-t2)-1][((2*(1+i1_3))-t1)-1]=(u[((2*(d3+i3_0))-d3)-1][((2*(1+i2_1))-t2)-1][((2*(1+i1_3))-t1)-1]+(0.25*(((z[(d3+i3_0)-1][1+i2_1][1+i1_3]+z[(d3+i3_0)-1][(1+i2_1)-1][1+i1_3])+z[(d3+i3_0)-1][1+i2_1][(1+i1_3)-1])+z[(d3+i3_0)-1][(1+i2_1)-1][(1+i1_3)-1])));
+					u[((2*i3)-d3)-1][((2*i2)-t2)-1][((2*i1)-t1)-1]=(u[((2*i3)-d3)-1][((2*i2)-t2)-1][((2*i1)-t1)-1]+(0.25*(((z[i3-1][i2][i1]+z[i3-1][i2-1][i1])+z[i3-1][i2][i1-1])+z[i3-1][i2-1][i1-1])));
 				}
-				i1=(1+i1_3);
 			}
-			i2=(1+i2_1);
 		}
-		i3=(d3+i3_0);
-		/* Normalized Loop */
-		#pragma cetus private(i1, i1_4, i1_5, i1_6, i1_7, i2, i2_2, i2_3) 
-		#pragma cetus lastprivate(i3_1) 
+		#pragma cetus private(i1, i2, i3) 
 		#pragma loop name interp#2 
 		#pragma cetus parallel 
-		#pragma omp parallel for if((10000<(((((((((((((((((-2L+(-3L*d1))+(3L*d2))+(6L*mm1))+(-6L*mm2))+(3L*mm3))+((-3L*d1)*d2))+((6L*d1)*mm2))+((3L*d1)*mm3))+((6L*d2)*mm1))+((-3L*d2)*mm3))+((-12L*mm1)*mm2))+((-6L*mm1)*mm3))+((6L*mm2)*mm3))+(((3L*d1)*d2)*mm3))+(((-6L*d1)*mm2)*mm3))+(((-6L*d2)*mm1)*mm3))+(((12L*mm1)*mm2)*mm3)))) private(i1, i1_4, i1_5, i1_6, i1_7, i2, i2_2, i2_3) lastprivate(i3_1)
-		for (i3_1=0; i3_1<=(-2+mm3); i3_1 ++ )
+		#pragma omp parallel for if((10000<(((((((((((((((((-2L+(-3L*d1))+d2)+(6L*mm1))+(-2L*mm2))+(3L*mm3))+((-3L*d1)*d2))+((6L*d1)*mm2))+((3L*d1)*mm3))+((6L*d2)*mm1))+((-1L*d2)*mm3))+((-12L*mm1)*mm2))+((-6L*mm1)*mm3))+((2L*mm2)*mm3))+(((3L*d1)*d2)*mm3))+(((-6L*d1)*mm2)*mm3))+(((-6L*d2)*mm1)*mm3))+(((12L*mm1)*mm2)*mm3)))) private(i1, i2, i3)
+		for (i3=1; i3<=(mm3-1); i3 ++ )
 		{
-			/* Normalized Loop */
-			#pragma cetus private(i1, i1_4, i1_5) 
-			#pragma cetus lastprivate(i2_2) 
+			#pragma cetus private(i1, i2) 
 			#pragma loop name interp#2#0 
-			for (i2_2=0; i2_2<=((-1+(-1*d2))+mm2); i2_2 ++ )
+			for (i2=d2; i2<=(mm2-1); i2 ++ )
 			{
-				/* Normalized Loop */
-				#pragma cetus lastprivate(i1_4) 
+				#pragma cetus private(i1) 
 				#pragma loop name interp#2#0#0 
-				for (i1_4=0; i1_4<=((-1+(-1*d1))+mm1); i1_4 ++ )
+				for (i1=d1; i1<=(mm1-1); i1 ++ )
 				{
-					u[((2*(1+i3_1))-t3)-1][((2*(d2+i2_2))-d2)-1][((2*(d1+i1_4))-d1)-1]=(u[((2*(1+i3_1))-t3)-1][((2*(d2+i2_2))-d2)-1][((2*(d1+i1_4))-d1)-1]+(0.5*(z[1+i3_1][(d2+i2_2)-1][(d1+i1_4)-1]+z[(1+i3_1)-1][(d2+i2_2)-1][(d1+i1_4)-1])));
+					u[((2*i3)-t3)-1][((2*i2)-d2)-1][((2*i1)-d1)-1]=(u[((2*i3)-t3)-1][((2*i2)-d2)-1][((2*i1)-d1)-1]+(0.5*(z[i3][i2-1][i1-1]+z[i3-1][i2-1][i1-1])));
 				}
-				i1=(d1+i1_4);
-				/* Normalized Loop */
-				#pragma cetus lastprivate(i1_5) 
+				#pragma cetus private(i1) 
 				#pragma loop name interp#2#0#1 
-				for (i1_5=0; i1_5<=(-2+mm1); i1_5 ++ )
+				for (i1=1; i1<=(mm1-1); i1 ++ )
 				{
-					u[((2*(1+i3_1))-t3)-1][((2*(d2+i2_2))-d2)-1][((2*(1+i1_5))-t1)-1]=(u[((2*(1+i3_1))-t3)-1][((2*(d2+i2_2))-d2)-1][((2*(1+i1_5))-t1)-1]+(0.25*(((z[1+i3_1][(d2+i2_2)-1][1+i1_5]+z[1+i3_1][(d2+i2_2)-1][(1+i1_5)-1])+z[(1+i3_1)-1][(d2+i2_2)-1][1+i1_5])+z[(1+i3_1)-1][(d2+i2_2)-1][(1+i1_5)-1])));
+					u[((2*i3)-t3)-1][((2*i2)-d2)-1][((2*i1)-t1)-1]=(u[((2*i3)-t3)-1][((2*i2)-d2)-1][((2*i1)-t1)-1]+(0.25*(((z[i3][i2-1][i1]+z[i3][i2-1][i1-1])+z[i3-1][i2-1][i1])+z[i3-1][i2-1][i1-1])));
 				}
-				i1=(1+i1_5);
 			}
-			i2=(d2+i2_2);
-			/* Normalized Loop */
-			#pragma cetus private(i1, i1_6, i1_7) 
-			#pragma cetus lastprivate(i2_3) 
+			#pragma cetus private(i1, i2) 
 			#pragma loop name interp#2#1 
-			for (i2_3=0; i2_3<=(-2+mm2); i2_3 ++ )
+			for (i2=1; i2<=(mm2-1); i2 ++ )
 			{
-				/* Normalized Loop */
-				#pragma cetus lastprivate(i1_6) 
+				#pragma cetus private(i1) 
 				#pragma loop name interp#2#1#0 
-				for (i1_6=0; i1_6<=((-1+(-1*d1))+mm1); i1_6 ++ )
+				for (i1=d1; i1<=(mm1-1); i1 ++ )
 				{
-					u[((2*(1+i3_1))-t3)-1][((2*(1+i2_3))-t2)-1][((2*(d1+i1_6))-d1)-1]=(u[((2*(1+i3_1))-t3)-1][((2*(1+i2_3))-t2)-1][((2*(d1+i1_6))-d1)-1]+(0.25*(((z[1+i3_1][1+i2_3][(d1+i1_6)-1]+z[1+i3_1][(1+i2_3)-1][(d1+i1_6)-1])+z[(1+i3_1)-1][1+i2_3][(d1+i1_6)-1])+z[(1+i3_1)-1][(1+i2_3)-1][(d1+i1_6)-1])));
+					u[((2*i3)-t3)-1][((2*i2)-t2)-1][((2*i1)-d1)-1]=(u[((2*i3)-t3)-1][((2*i2)-t2)-1][((2*i1)-d1)-1]+(0.25*(((z[i3][i2][i1-1]+z[i3][i2-1][i1-1])+z[i3-1][i2][i1-1])+z[i3-1][i2-1][i1-1])));
 				}
-				i1=(d1+i1_6);
-				/* Normalized Loop */
-				#pragma cetus lastprivate(i1_7) 
+				#pragma cetus private(i1) 
 				#pragma loop name interp#2#1#1 
-				for (i1_7=0; i1_7<=(-2+mm1); i1_7 ++ )
+				for (i1=1; i1<=(mm1-1); i1 ++ )
 				{
-					u[((2*(1+i3_1))-t3)-1][((2*(1+i2_3))-t2)-1][((2*(1+i1_7))-t1)-1]=(u[((2*(1+i3_1))-t3)-1][((2*(1+i2_3))-t2)-1][((2*(1+i1_7))-t1)-1]+(0.125*(((((((z[1+i3_1][1+i2_3][1+i1_7]+z[1+i3_1][(1+i2_3)-1][1+i1_7])+z[1+i3_1][1+i2_3][(1+i1_7)-1])+z[1+i3_1][(1+i2_3)-1][(1+i1_7)-1])+z[(1+i3_1)-1][1+i2_3][1+i1_7])+z[(1+i3_1)-1][(1+i2_3)-1][1+i1_7])+z[(1+i3_1)-1][1+i2_3][(1+i1_7)-1])+z[(1+i3_1)-1][(1+i2_3)-1][(1+i1_7)-1])));
+					u[((2*i3)-t3)-1][((2*i2)-t2)-1][((2*i1)-t1)-1]=(u[((2*i3)-t3)-1][((2*i2)-t2)-1][((2*i1)-t1)-1]+(0.125*(((((((z[i3][i2][i1]+z[i3][i2-1][i1])+z[i3][i2][i1-1])+z[i3][i2-1][i1-1])+z[i3-1][i2][i1])+z[i3-1][i2-1][i1])+z[i3-1][i2][i1-1])+z[i3-1][i2-1][i1-1])));
 				}
-				i1=(1+i1_7);
 			}
-			i2=(1+i2_3);
 		}
-		i3=(1+i3_1);
 	}
 	if (timeron)
 	{
@@ -1211,9 +1061,6 @@ static void norm2u3(void * or, int n1, int n2, int n3, double * rnm2, double * r
 	double s, a;
 	int i3, i2, i1;
 	double dn;
-	int i3_0;
-	int i2_0;
-	int i1_0;
 	if (timeron)
 	{
 		timer_start(8);
@@ -1221,36 +1068,27 @@ static void norm2u3(void * or, int n1, int n2, int n3, double * rnm2, double * r
 	dn=(((1.0*nx)*ny)*nz);
 	s=0.0;
 	( * rnmu)=0.0;
-	/* Normalized Loop */
-	#pragma cetus private(a, i1, i1_0, i2, i2_0) 
-	#pragma cetus lastprivate(i3_0) 
+	#pragma cetus private(a, i1, i2, i3) 
 	#pragma loop name norm2u3#0 
-	for (i3_0=0; i3_0<=(-3+n3); i3_0 ++ )
+	for (i3=1; i3<(n3-1); i3 ++ )
 	{
-		/* Normalized Loop */
-		#pragma cetus private(a, i1, i1_0) 
-		#pragma cetus lastprivate(i2_0) 
+		#pragma cetus private(a, i1, i2) 
 		#pragma loop name norm2u3#0#0 
-		for (i2_0=0; i2_0<=(-3+n2); i2_0 ++ )
+		for (i2=1; i2<(n2-1); i2 ++ )
 		{
-			/* Normalized Loop */
-			#pragma cetus private(a) 
-			#pragma cetus lastprivate(i1_0) 
+			#pragma cetus private(a, i1) 
 			#pragma loop name norm2u3#0#0#0 
-			for (i1_0=0; i1_0<=(-3+n1); i1_0 ++ )
+			for (i1=1; i1<(n1-1); i1 ++ )
 			{
-				s=(s+pow(r[1+i3_0][1+i2_0][1+i1_0], 2.0));
-				a=fabs(r[1+i3_0][1+i2_0][1+i1_0]);
+				s=(s+pow(r[i3][i2][i1], 2.0));
+				a=fabs(r[i3][i2][i1]);
 				if (a>( * rnmu))
 				{
 					( * rnmu)=a;
 				}
 			}
-			i1=(1+i1_0);
 		}
-		i2=(1+i2_0);
 	}
-	i3=(1+i3_0);
 	( * rnm2)=sqrt(s/dn);
 	if (timeron)
 	{
@@ -1275,49 +1113,38 @@ static void comm3(void * ou, int n1, int n2, int n3, int kk)
 {
 	double (* u)[n2][n1] = (double (* )[n2][n1])ou;
 	int i1, i2, i3;
-	int i3_0;
-	int i2_0;
-	int i3_1;
 	if (timeron)
 	{
 		timer_start(9);
 	}
-	/* Normalized Loop */
-	#pragma cetus private(i2, i2_0) 
-	#pragma cetus lastprivate(i3_0) 
+	#pragma cetus private(i2, i3) 
 	#pragma loop name comm3#0 
 	#pragma cetus parallel 
-	#pragma omp parallel for if((10000<(((9L+(-8L*n2))+(-4L*n3))+((4L*n2)*n3)))) private(i2, i2_0) lastprivate(i3_0)
-	for (i3_0=0; i3_0<=(-3+n3); i3_0 ++ )
+	#pragma omp parallel for if((10000<(((11L+(-8L*n2))+(-5L*n3))+((4L*n2)*n3)))) private(i2, i3)
+	for (i3=1; i3<(n3-1); i3 ++ )
 	{
-		/* Normalized Loop */
-		#pragma cetus lastprivate(i2_0) 
+		#pragma cetus private(i2) 
 		#pragma loop name comm3#0#0 
-		for (i2_0=0; i2_0<=(-3+n2); i2_0 ++ )
+		for (i2=1; i2<(n2-1); i2 ++ )
 		{
-			u[1+i3_0][1+i2_0][0]=u[1+i3_0][1+i2_0][n1-2];
-			u[1+i3_0][1+i2_0][n1-1]=u[1+i3_0][1+i2_0][1];
+			u[i3][i2][0]=u[i3][i2][n1-2];
+			u[i3][i2][n1-1]=u[i3][i2][1];
 		}
-		i2=(1+i2_0);
 	}
-	i3=(1+i3_0);
-	/* Normalized Loop */
-	#pragma cetus private(i1) 
-	#pragma cetus lastprivate(i3_1) 
+	#pragma cetus private(i1, i3) 
 	#pragma loop name comm3#1 
 	#pragma cetus parallel 
-	#pragma omp parallel for if((10000<(((-5L+(-8L*n1))+(3L*n3))+((4L*n1)*n3)))) private(i1) lastprivate(i3_1)
-	for (i3_1=0; i3_1<=(-3+n3); i3_1 ++ )
+	#pragma omp parallel for if((10000<(((-5L+(-8L*n1))+(3L*n3))+((4L*n1)*n3)))) private(i1, i3)
+	for (i3=1; i3<(n3-1); i3 ++ )
 	{
 		#pragma cetus private(i1) 
 		#pragma loop name comm3#1#0 
 		for (i1=0; i1<n1; i1 ++ )
 		{
-			u[1+i3_1][0][i1]=u[1+i3_1][n2-2][i1];
-			u[1+i3_1][n2-1][i1]=u[1+i3_1][1][i1];
+			u[i3][0][i1]=u[i3][n2-2][i1];
+			u[i3][n2-1][i1]=u[i3][1][i1];
 		}
 	}
-	i3=(1+i3_1);
 	#pragma cetus private(i1, i2) 
 	#pragma loop name comm3#2 
 	#pragma cetus parallel 
@@ -1356,14 +1183,6 @@ static void zran3(void * oz, int n1, int n2, int n3, int nx, int ny, int k)
 	int i, j1[mm][2], j2[mm][2], j3[mm][2];
 	int jg[4][mm][2];
 	double rdummy;
-	int i3_0;
-	int i2_0;
-	int i3_1;
-	int i2_1;
-	int i1_0;
-	int i_0;
-	int i_1;
-	int i_2;
 	a1=power(a, nx);
 	a2=power(a, nx*ny);
 	zero3(z, n1, n2, n3);
@@ -1375,27 +1194,21 @@ static void zran3(void * oz, int n1, int n2, int n3, int nx, int ny, int k)
 	e3=((ie3-is3)+2);
 	x0=x;
 	rdummy=randlc( & x0, ai);
-	/* Normalized Loop */
-	#pragma cetus private(i2, i2_0, rdummy) 
-	#pragma cetus lastprivate(i3_0) 
+	#pragma cetus private(i2, i3, rdummy) 
 	#pragma loop name zran3#0 
-	for (i3_0=0; i3_0<=(-2+e3); i3_0 ++ )
+	for (i3=1; i3<e3; i3 ++ )
 	{
 		x1=x0;
-		/* Normalized Loop */
-		#pragma cetus private(rdummy) 
-		#pragma cetus lastprivate(i2_0) 
+		#pragma cetus private(i2, rdummy) 
 		#pragma loop name zran3#0#0 
-		for (i2_0=0; i2_0<=(-2+e2); i2_0 ++ )
+		for (i2=1; i2<e2; i2 ++ )
 		{
 			xx=x1;
-			vranlc(d1,  & xx, a,  & z[1+i3_0][1+i2_0][1]);
+			vranlc(d1,  & xx, a,  & z[i3][i2][1]);
 			rdummy=randlc( & x1, a1);
 		}
-		i2=(1+i2_0);
 		rdummy=randlc( & x0, a2);
 	}
-	i3=(1+i3_0);
 	/* --------------------------------------------------------------------- */
 	/* comm3(z,n1,n2,n3); */
 	/* showall(z,n1,n2,n3); */
@@ -1418,90 +1231,79 @@ static void zran3(void * oz, int n1, int n2, int n3, int nx, int ny, int k)
 		j2[i][0]=0;
 		j3[i][0]=0;
 	}
-	/* Normalized Loop */
-	#pragma cetus private(i1, i1_0, i2, i2_1) 
-	#pragma cetus lastprivate(i3_1) 
+	#pragma cetus private(i1, i2, i3) 
 	#pragma loop name zran3#2 
-	for (i3_1=0; i3_1<=(-3+n3); i3_1 ++ )
+	for (i3=1; i3<(n3-1); i3 ++ )
 	{
-		/* Normalized Loop */
-		#pragma cetus private(i1, i1_0) 
-		#pragma cetus lastprivate(i2_1) 
+		#pragma cetus private(i1, i2) 
 		#pragma loop name zran3#2#0 
-		for (i2_1=0; i2_1<=(-3+n2); i2_1 ++ )
+		for (i2=1; i2<(n2-1); i2 ++ )
 		{
-			/* Normalized Loop */
-			#pragma cetus lastprivate(i1_0) 
+			#pragma cetus private(i1) 
 			#pragma loop name zran3#2#0#0 
-			for (i1_0=0; i1_0<=(-3+n1); i1_0 ++ )
+			for (i1=1; i1<(n1-1); i1 ++ )
 			{
-				if (z[1+i3_1][1+i2_1][1+i1_0]>ten[0][1])
+				if (z[i3][i2][i1]>ten[0][1])
 				{
-					ten[0][1]=z[1+i3_1][1+i2_1][1+i1_0];
-					j1[0][1]=(1+i1_0);
-					j2[0][1]=(1+i2_1);
-					j3[0][1]=(1+i3_1);
+					ten[0][1]=z[i3][i2][i1];
+					j1[0][1]=i1;
+					j2[0][1]=i2;
+					j3[0][1]=i3;
 					bubble(ten, j1, j2, j3, mm, 1);
 				}
-				if (z[1+i3_1][1+i2_1][1+i1_0]<ten[0][0])
+				if (z[i3][i2][i1]<ten[0][0])
 				{
-					ten[0][0]=z[1+i3_1][1+i2_1][1+i1_0];
-					j1[0][0]=(1+i1_0);
-					j2[0][0]=(1+i2_1);
-					j3[0][0]=(1+i3_1);
+					ten[0][0]=z[i3][i2][i1];
+					j1[0][0]=i1;
+					j2[0][0]=i2;
+					j3[0][0]=i3;
 					bubble(ten, j1, j2, j3, mm, 0);
 				}
 			}
-			i1=(1+i1_0);
 		}
-		i2=(1+i2_1);
 	}
-	i3=(1+i3_1);
 	/* --------------------------------------------------------------------- */
 	/* Now which of these are globally best? */
 	/* --------------------------------------------------------------------- */
 	i1=(mm-1);
 	i0=(mm-1);
-	/* Normalized Loop */
-	#pragma cetus private(best) 
-	#pragma cetus lastprivate(i_0) 
+	#pragma cetus private(best, i) 
 	#pragma loop name zran3#3 
-	for (i_0=0; i_0<=(-1+mm); i_0 ++ )
+	for (i=(mm-1); i>=0; i -- )
 	{
 		best=0.0;
 		if (best<ten[i1][1])
 		{
-			jg[0][(-1+(-1*i_0))+mm][1]=0;
-			jg[1][(-1+(-1*i_0))+mm][1]=((is1-2)+j1[i1][1]);
-			jg[2][(-1+(-1*i_0))+mm][1]=((is2-2)+j2[i1][1]);
-			jg[3][(-1+(-1*i_0))+mm][1]=((is3-2)+j3[i1][1]);
+			jg[0][i][1]=0;
+			jg[1][i][1]=((is1-2)+j1[i1][1]);
+			jg[2][i][1]=((is2-2)+j2[i1][1]);
+			jg[3][i][1]=((is3-2)+j3[i1][1]);
 			i1=(i1-1);
 		}
 		else
 		{
-			jg[0][(-1+(-1*i_0))+mm][1]=0;
-			jg[1][(-1+(-1*i_0))+mm][1]=0;
-			jg[2][(-1+(-1*i_0))+mm][1]=0;
-			jg[3][(-1+(-1*i_0))+mm][1]=0;
+			jg[0][i][1]=0;
+			jg[1][i][1]=0;
+			jg[2][i][1]=0;
+			jg[3][i][1]=0;
 		}
 		best=1.0;
 		if (best>ten[i0][0])
 		{
-			jg[0][(-1+(-1*i_0))+mm][0]=0;
-			jg[1][(-1+(-1*i_0))+mm][0]=((is1-2)+j1[i0][0]);
-			jg[2][(-1+(-1*i_0))+mm][0]=((is2-2)+j2[i0][0]);
-			jg[3][(-1+(-1*i_0))+mm][0]=((is3-2)+j3[i0][0]);
+			jg[0][i][0]=0;
+			jg[1][i][0]=((is1-2)+j1[i0][0]);
+			jg[2][i][0]=((is2-2)+j2[i0][0]);
+			jg[3][i][0]=((is3-2)+j3[i0][0]);
 			i0=(i0-1);
 		}
 		else
 		{
-			jg[0][(-1+(-1*i_0))+mm][0]=0;
-			jg[1][(-1+(-1*i_0))+mm][0]=0;
-			jg[2][(-1+(-1*i_0))+mm][0]=0;
-			jg[3][(-1+(-1*i_0))+mm][0]=0;
+			jg[0][i][0]=0;
+			jg[1][i][0]=0;
+			jg[2][i][0]=0;
+			jg[3][i][0]=0;
 		}
 	}
-	i=((-1+(-1*i_0))+mm);
 	/*  m1 = i1+1; */
 	/*  m0 = i0+1; */
 	m1=0;
@@ -1570,22 +1372,18 @@ static void zran3(void * oz, int n1, int n2, int n3, int nx, int ny, int k)
 			}
 		}
 	}
-	/* Normalized Loop */
-	#pragma cetus lastprivate(i_1) 
+	#pragma cetus private(i) 
 	#pragma loop name zran3#5 
-	for (i_1=0; i_1<=((-1+(-1*m0))+mm); i_1 ++ )
+	for (i=(mm-1); i>=m0; i -- )
 	{
-		z[jg[3][(-1+(-1*i_1))+mm][0]][jg[2][(-1+(-1*i_1))+mm][0]][jg[1][(-1+(-1*i_1))+mm][0]]=( - 1.0);
+		z[jg[3][i][0]][jg[2][i][0]][jg[1][i][0]]=( - 1.0);
 	}
-	i=((-1+(-1*i_1))+mm);
-	/* Normalized Loop */
-	#pragma cetus lastprivate(i_2) 
+	#pragma cetus private(i) 
 	#pragma loop name zran3#6 
-	for (i_2=0; i_2<=((-1+(-1*m1))+mm); i_2 ++ )
+	for (i=(mm-1); i>=m1; i -- )
 	{
-		z[jg[3][(-1+(-1*i_2))+mm][1]][jg[2][(-1+(-1*i_2))+mm][1]][jg[1][(-1+(-1*i_2))+mm][1]]=( + 1.0);
+		z[jg[3][i][1]][jg[2][i][1]][jg[1][i][1]]=( + 1.0);
 	}
-	i=((-1+(-1*i_2))+mm);
 	comm3(z, n1, n2, n3, k);
 	/* --------------------------------------------------------------------- */
 	/* showall(z,n1,n2,n3); */

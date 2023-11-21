@@ -41,71 +41,17 @@ wchar_t uses Unicode 10.0.0.  Version 10.0 of the Unicode Standard is
    - 285 hentaigana
    - 3 additional Zanabazar Square characters
 */
-/*
-
-Copyright (C) 1991-2022 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it andor
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <https:www.gnu.orglicenses/>. 
-
-*/
-/*
-
-This header is separate from features.h so that the compiler can
-   include it implicitly at the start of every compilation.  It must
-   not itself include <features.h> or any other header that includes
-   <features.h> because the implicit include comes before any feature
-   test macros that may be defined in a source file before it first
-   explicitly includes a system header.  GCC knows the name of this
-   header in order to preinclude it. 
-
-*/
-/*
-
-glibc's intent is to support the IEC 559 math functionality, real
-   and complex.  If the GCC (4.9 and later) predefined macros
-   specifying compiler intent are available, use them to determine
-   whether the overall intent is to support these features; otherwise,
-   presume an older compiler has intent to support these features and
-   define these macros by default. 
-
-*/
-/*
-
-wchar_t uses Unicode 10.0.0.  Version 10.0 of the Unicode Standard is
-   synchronized with ISOIEC 10646:2017, fifth edition, plus
-   the following additions from Amendment 1 to the fifth edition:
-   - 56 emoji characters
-   - 285 hentaigana
-   - 3 additional Zanabazar Square characters
-
-*/
 /* ========================================================================== */
 /* === Supernodalcholmod_super_numeric ===================================== */
 /* ========================================================================== */
 /*
-
 -----------------------------------------------------------------------------
- CHOLMODSupernodal Module.  Copyright (C) 2005-2006, Timothy A. Davis
+ CHOLMOD/Supernodal Module.  Copyright (C) 2005-2006, Timothy A. Davis
  * http:www.suitesparse.com
  * --------------------------------------------------------------------------
-
 */
 /*
-
-Computes the Cholesky factorization of A+betaI or AF+beta*I.  Only the
+Computes the Cholesky factorization of A+betaI or A*F+beta*I.  Only the
  * the lower triangular part of A+beta*I or A*F+beta*I is accessed.  The
  * matrices A and F must already be permuted according to the fill-reduction
  * permutation L->Perm.  cholmod_factorize is an "easy" wrapper for this code
@@ -150,32 +96,16 @@ Computes the Cholesky factorization of A+betaI or AF+beta*I.  Only the
  * match A (except that L can be complex and A zomplex).  The xtype of A and F
  * must match.
 
-
 */
 #include <sys/time.h>
 #include "cholmod_internal.h"
 #include "cholmod_supernodal.h"
 #include <stdio.h>
-#include <omp.h>
-/*
-
-#pragma startinclude #include <stdlib.h>
-#line 105
+/* #include <omp.h>
 #include <stdlib.h>
-#pragma endinclude
-#line 106
-#pragma startinclude #include <assert.h>
-#line 106
 #include <assert.h>
-#pragma endinclude
-#line 107
-#pragma startinclude #include "cholmod_template.h"
-#line 107
 #include "cholmod_template.h"
-#pragma endinclude
-#line 108
-==========================================================================
-*/
+/* ========================================================================== */
 /* === TEMPLATE codes for GPU and regular numeric factorization ============= */
 /* ========================================================================== */
 /* #define REAL */
@@ -191,11 +121,9 @@ Computes the Cholesky factorization of A+betaI or AF+beta*I.  Only the
 /* === cholmod_super_numeric ================================================ */
 /* ========================================================================== */
 /*
-
 Returns TRUE if successful, or if the matrix is not positive definite.
  Returns FALSE if out of memory, inputs are invalid, or other fatal error
- occurs.
-
+ * occurs.
 
 */
 /* ---- input ---- */
@@ -205,7 +133,7 @@ Returns TRUE if successful, or if the matrix is not positive definite.
 /* ---- inout --- */
 /* factorization */
 /* --------------- */
-int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2], cholmod_factor * L, cholmod_common * Common)
+int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2], cholmod_factor * L, cholmod_common * Common)
 {
 	cholmod_dense * C;
 	int * Super, * Map, * SuperMap;
@@ -355,7 +283,7 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 	n=nrow;
 	;
 	;
-	/* w = 2n + 5nsuper */
+	/* w = 2n + 5*nsuper */
 	w=cholmod_mult_size_t(n, 2,  & ok);
 	t=cholmod_mult_size_t(nsuper, 5,  & ok);
 	w=cholmod_add_size_t(w, t,  & ok);
@@ -399,10 +327,8 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 		if (symbolic)
 		{
 			/*
-			
-						Change L back to symbolic, since the numeric values are not
-							 initialized.  This cannot fail.
-						
+			Change L back to symbolic, since the numeric values are not
+				 initialized.  This cannot fail.
 			*/
 			cholmod_change_factor(0, 1, 1, 1, 1, L, Common);
 		}
@@ -420,16 +346,12 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 	/* get workspace */
 	/* ---------------------------------------------------------------------- */
 	SuperMap=Common->Iwork;
-	/* size n (iil) */
+	/* size n (ii/l) */
 	Map=Common->Flag;
 	/* size n, use Flag as workspace for Map array */
-	#pragma loop name cholmod_super_numeric#0 
-	#pragma cetus private(i) 
-	#pragma cetus parallel 
 	#pragma cetus private(i) 
 	#pragma loop name cholmod_super_numeric#0 
 	#pragma cetus parallel 
-	/* #pragma omp parallel for if(() private(i) */
 	#pragma omp parallel for if((10000<(1L+(3L*n)))) private(i)
 	for (i=0; i<n; i ++ )
 	{
@@ -439,21 +361,16 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 	/* find the mapping of nodes to relaxed supernodes */
 	/* ---------------------------------------------------------------------- */
 	/* SuperMap [k] = s if column k is contained in supernode s */
-	#pragma loop name cholmod_super_numeric#1 
-	#pragma cetus private(k, k_0, s) 
 	#pragma cetus private(k, k_0, s) 
 	#pragma loop name cholmod_super_numeric#1 
 	for (s=0; s<nsuper; s ++ )
 	{
 		/* Normalized Loop */
-		#pragma loop name cholmod_super_numeric#1#0 
 		#pragma cetus lastprivate(k_0) 
+		#pragma loop name cholmod_super_numeric#1#0 
 		#pragma cetus parallel 
-		#pragma cetus lastprivate(k_0) 
-		#pragma loop name cholmod_super_numeric#1#0 
-		/* #pragma omp parallel for if(() lastprivate(k_0) */
 		#pragma omp parallel for if((10000<((1L+(3L*Super[(1L+s)]))+(-3L*Super[s])))) lastprivate(k_0)
-		for (k_0=0; k_0<=((( - 1)+Super[1+s])+(( - 1)*Super[s])); k_0 ++ )
+		for (k_0=0; k_0<=((-1+Super[1+s])+(-1*Super[s])); k_0 ++ )
 		{
 			SuperMap[k_0+Super[s]]=s;
 		}
@@ -466,10 +383,8 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 	/* guard against integer overflow in the BLAS */
 	/* ---------------------------------------------------------------------- */
 	/*
-	
-		If integer overflow occurs in the BLAS, Common->status is set to
-		 CHOLMOD_TOO_LARGE, and the contents of Lx are undefined.
-		
+	If integer overflow occurs in the BLAS, Common->status is set to
+	 CHOLMOD_TOO_LARGE, and the contents of Lx are undefined.
 	*/
 	Common->blas_ok=1;
 	/* ---------------------------------------------------------------------- */
@@ -480,26 +395,24 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 	Cw=C->x;
 	/* workspace of size L->maxcsize */
 	one[0]=1.0;
-	/* ALPHA forsyrk,herk, *gemm, and *trsm */
+	/* ALPHA forsyrk, *herk, *gemm, and *trsm */
 	one[1]=0.0;
 	zero[0]=0.0;
-	/* BETA forsyrk,herk, and *gemm */
+	/* BETA forsyrk, *herk, and *gemm */
 	zero[1]=0.0;
 	/*
-	
-		Iwork must be of size 2n + 5nsuper, allocated in the caller,
-		 cholmod_super_numeric.  The memory cannot be allocated here because the
-		            * cholmod_super_numeric initializes SuperMap, and cholmod_allocate_work
-		            * does not preserve existing workspace if the space needs to be increase
-		            * in size.
-		
+	Iwork must be of size 2n + 5nsuper, allocated in the caller,
+	            * cholmod_super_numeric.  The memory cannot be allocated here because the
+	            * cholmod_super_numeric initializes SuperMap, and cholmod_allocate_work
+	            * does not preserve existing workspace if the space needs to be increase
+	            * in size.
 	*/
 	/* allocate integer workspace */
 	Iwork=Common->Iwork;
 	SuperMap=Iwork;
-	/* size n (iil) */
+	/* size n (ii/l) */
 	RelativeMap=(Iwork+n);
-	/* size n (iil) */
+	/* size n (ii/l) */
 	Next=(Iwork+(2*((size_t)n)));
 	/* size nsuper */
 	Lpos=((Iwork+(2*((size_t)n)))+nsuper);
@@ -551,36 +464,27 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 	Anz=A->nz;
 	Apacked=A->packed;
 	/* clear the Map so that changes in the pattern of A can be detected */
-	#pragma loop name cholmod_super_numeric#2 
-	#pragma cetus private(i) 
-	#pragma cetus parallel 
 	#pragma cetus private(i) 
 	#pragma loop name cholmod_super_numeric#2 
 	#pragma cetus parallel 
-	/* #pragma omp parallel for if(() private(i) */
 	#pragma omp parallel for if((10000<(1L+(3L*n)))) private(i)
 	for (i=0; i<n; i ++ )
 	{
 		Map[i]=( - 1);
 	}
 	/*
-	
-		If the matrix is not positive definite, the supernode s containing the
-		 first zero or negative diagonal entry of L is repeated (but factorized
-		 only up to just before the problematic diagonal entry). The purpose is
-		            * to provide MATLAB with [R,p]=chol(A); columns 1 to p-1 of L=R' are
-		            * required, where L(p,p) is the problematic diagonal entry.  The
-		            * repeat_supernode flag tells us whether this is the repeated supernode.
-		            * Once supernode s is repeated, the factorization is terminated.
-		
+	If the matrix is not positive definite, the supernode s containing the
+	 first zero or negative diagonal entry of L is repeated (but factorized
+	            * only up to just before the problematic diagonal entry). The purpose is
+	            * to provide MATLAB with [R,p]=chol(A); columns 1 to p-1 of L=R' are
+	            * required, where L(p,p) is the problematic diagonal entry.  The
+	            * repeat_supernode flag tells us whether this is the repeated supernode.
+	            * Once supernode s is repeated, the factorization is terminated.
 	*/
 	repeat_supernode=0;
 	/* ---------------------------------------------------------------------- */
 	/* supernodal numerical factorization */
 	/* ---------------------------------------------------------------------- */
-	#pragma loop name cholmod_super_numeric#3 
-	/* #pragma cetus reduction(+: Common->cholmod_cpu_gemm_calls, Common->cholmod_cpu_gemm_time, Common->cholmod_cpu_potrf_calls, Common->cholmod_cpu_potrf_time, Common->cholmod_cpu_syrk_calls, Common->cholmod_cpu_syrk_time, Common->cholmod_cpu_trsm_calls, Common->cholmod_cpu_trsm_time)  */
-	#pragma cetus private(d, fjk, i, i_0, j, k, k_1, k_2, kd1, kd2, p, p_0, p_1, p_2, p_3, pdend, pdi, pdi1, pdi2, pdx, pdx1, pf, pf_0, pk, px, q, ss_0, tstart) 
 	#pragma cetus private(d, fjk, i, i_0, j, k, k_1, k_2, kd1, kd2, p, p_0, p_1, p_2, p_3, pdend, pdi, pdi1, pdi2, pdx, pdx1, pf, pf_0, pk, px, q, ss_0, tstart) 
 	#pragma loop name cholmod_super_numeric#3 
 	/* #pragma cetus reduction(+: Common->cholmod_cpu_gemm_calls, Common->cholmod_cpu_gemm_time, Common->cholmod_cpu_potrf_calls, Common->cholmod_cpu_potrf_time, Common->cholmod_cpu_syrk_calls, Common->cholmod_cpu_syrk_time, Common->cholmod_cpu_trsm_calls, Common->cholmod_cpu_trsm_time)  */
@@ -611,15 +515,11 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 		/* Case of no GPU, zero individual supernodes */
 		/* #pragma omp parallel for num_threads(CHOLMOD_OMP_NUM_THREADS)               schedule (static) if ( pend - psx > 1024 ) */
 		/* Normalized Loop */
-		#pragma loop name cholmod_super_numeric#3#0 
-		#pragma cetus lastprivate(p_0) 
-		#pragma cetus parallel 
 		#pragma cetus lastprivate(p_0) 
 		#pragma loop name cholmod_super_numeric#3#0 
 		#pragma cetus parallel 
-		/* #pragma omp parallel for if(() lastprivate(p_0) */
 		#pragma omp parallel for if((10000<((((1L+((-3L*k1)*psend))+((3L*k1)*psi))+((3L*k2)*psend))+((-3L*k2)*psi)))) lastprivate(p_0)
-		for (p_0=0; p_0<=((( - 1)+pend)+(( - 1)*psx)); p_0 ++ )
+		for (p_0=0; p_0<=((-1+pend)+(-1*psx)); p_0 ++ )
 		{
 			/* L_CLEAR (Lx,p); */
 			Lx[p_0+psx]=0;
@@ -629,14 +529,10 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 		/* construct the scattered Map for supernode s */
 		/* ------------------------------------------------------------------ */
 		/*
-		
-				If row i is the kth row in s, then Map [i] = k.  Similarly, if
-				 column j is the kth column in s, then  Map [j] = k.
-				
+		If row i is the kth row in s, then Map [i] = k.  Similarly, if
+		 column j is the kth column in s, then  Map [j] = k.
 		*/
 		/* #pragma omp parallel for num_threads(CHOLMOD_OMP_NUM_THREADS)               if ( nsrow > 128 ) */
-		#pragma loop name cholmod_super_numeric#3#1 
-		#pragma cetus private(k) 
 		#pragma cetus private(k) 
 		#pragma loop name cholmod_super_numeric#3#1 
 		for (k=0; k<nsrow; k ++ )
@@ -652,38 +548,28 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 		/* gettimeofday(&start,NULL); */
 		/* #pragma omp parallel for private ( p, pend, pfend, pf, i, j, imap, q )              num_threads(CHOLMOD_OMP_NUM_THREADS) if ( k2-k1 > 64 ) */
 		/* Normalized Loop */
+		#pragma cetus private(fjk, j, p, p_1, pf, pf_0) 
+		#pragma cetus lastprivate(k_1) 
 		#pragma loop name cholmod_super_numeric#3#2 
 		/* #pragma cetus reduction(+: Lx[((Map[Ai[(p_1+Ap[j])]]+psx)+(((k1+k_1)-k1)nsrow))])  */
-		#pragma cetus private(fjk, j, p, p_1, pf, pf_0) 
-		#pragma cetus lastprivate(k_1) 
-		#pragma cetus private(fjk, j, p, p_1, pf, pf_0) 
-		#pragma cetus lastprivate(k_1) 
-		#pragma loop name cholmod_super_numeric#3#2 
-		/* #pragma cetus reduction(+: )  */
-		/* #pragma omp parallel for private(fjk, j, p, p_1, pf, pf_0) lastprivate(k_1) */
-		for (k_1=0; k_1<=((( - 1)+(( - 1)*k1))+k2); k_1 ++ )
+		#pragma cetus parallel 
+		#pragma omp parallel for private(fjk, j, p, p_1, pf, pf_0) lastprivate(k_1)
+		for (k_1=0; k_1<=((-1+(-1*k1))+k2); k_1 ++ )
 		{
 			/* Normalized Loop */
-			#pragma loop name cholmod_super_numeric#3#2#0 
-			/* #pragma cetus reduction(+: Lx[((Map[Ai[(p_1+Ap[j])]]+psx)+(((k1+k_1)-k1)nsrow))])  */
-			#pragma cetus private(fjk, j, p, p_1) 
-			#pragma cetus lastprivate(pf_0) 
 			#pragma cetus private(fjk, j, p, p_1) 
 			#pragma cetus lastprivate(pf_0) 
 			#pragma loop name cholmod_super_numeric#3#2#0 
 			/* #pragma cetus reduction(+: Lx[((Map[Ai[(p_1+Ap[j])]]+psx)+(((k1+k_1)-k1)nsrow))])  */
-			for (pf_0=0; pf_0<=((( - 1)+Fp[(1+k1)+k_1])+(( - 1)*Fp[k1+k_1])); pf_0 ++ )
+			for (pf_0=0; pf_0<=((-1+Fp[(1+k1)+k_1])+(-1*Fp[k1+k_1])); pf_0 ++ )
 			{
 				j=Fi[pf_0+Fp[k1+k_1]];
 				fjk[0]=Fx[pf_0+Fp[k1+k_1]];
 				/* Normalized Loop */
+				#pragma cetus lastprivate(p_1) 
 				#pragma loop name cholmod_super_numeric#3#2#0#0 
 				/* #pragma cetus reduction(+: Lx[((Map[Ai[(p_1+Ap[j])]]+psx)+(((k1+k_1)-k1)nsrow))])  */
-				#pragma cetus lastprivate(p_1) 
-				#pragma cetus lastprivate(p_1) 
-				#pragma loop name cholmod_super_numeric#3#2#0#0 
-				/* #pragma cetus reduction(+: )  */
-				for (p_1=0; p_1<=((( - 1)+Ap[1+j])+(( - 1)*Ap[j])); p_1 ++ )
+				for (p_1=0; p_1<=((-1+Ap[1+j])+(-1*Ap[j])); p_1 ++ )
 				{
 					if (Ai[p_1+Ap[j]]>=(k1+k_1))
 					{
@@ -701,20 +587,17 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 		}
 		k=(k1+k_1);
 		/* gettimeofday(&end, NULL); */
-		/* sum += (end.tv_sec + (double)end.tv_usec1000000) - (start.tv_sec + (double)start.tv_usec1000000);        */
+		/* sum += (end.tv_sec + (double)end.tv_usec1000000) - (start.tv_sec + (double)start.tv_usec/1000000);        */
 		/* add beta to the diagonal of the supernode, if nonzero */
 		if (beta[0]!=0.0)
 		{
 			/* note that only the real part of beta is used */
 			pk=psx;
 			/* Normalized Loop */
-			#pragma loop name cholmod_super_numeric#3#3 
-			/* #pragma cetus reduction(+: Lx[pk])  */
-			#pragma cetus lastprivate(k_2) 
 			#pragma cetus lastprivate(k_2) 
 			#pragma loop name cholmod_super_numeric#3#3 
 			/* #pragma cetus reduction(+: Lx[pk])  */
-			for (k_2=0; k_2<=((( - 1)+(( - 1)*k1))+k2); k_2 ++ )
+			for (k_2=0; k_2<=((-1+(-1*k1))+k2); k_2 ++ )
 			{
 				/* Lx [pk] += beta [0] ; */
 				Lx[pk]+=beta[0];
@@ -729,14 +612,10 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 		if ( ! repeat_supernode)
 		{
 			/*
-			
-						Save the list of pending descendants in case s is not positive
-						 definite.  Also save Lpos for each descendant d, so that we can
-						 find which part of d is used to update s.
-						
+			Save the list of pending descendants in case s is not positive
+			 definite.  Also save Lpos for each descendant d, so that we can
+			                    * find which part of d is used to update s.
 			*/
-			#pragma loop name cholmod_super_numeric#3#4 
-			#pragma cetus private(d) 
 			#pragma cetus private(d) 
 			#pragma loop name cholmod_super_numeric#3#4 
 			for (d=Head[s]; d!=( - 1); d=Next[d])
@@ -747,8 +626,6 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 		}
 		else
 		{
-			#pragma loop name cholmod_super_numeric#3#5 
-			#pragma cetus private(d) 
 			#pragma cetus private(d) 
 			#pragma loop name cholmod_super_numeric#3#5 
 			for (d=Head[s]; d!=( - 1); d=Next[d])
@@ -797,8 +674,6 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 			;
 			;
 			;
-			#pragma loop name cholmod_super_numeric#3#6 
-			#pragma cetus lastprivate(pdi2) 
 			#pragma cetus lastprivate(pdi2) 
 			#pragma loop name cholmod_super_numeric#3#6 
 			for (pdi2=pdi1; (pdi2<pdend)&&(Ls[pdi2]<k2); pdi2 ++ )
@@ -810,10 +685,8 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 			ndrow2=(pdend-pdi1);
 			/* # rows in remaining d */
 			/*
-			
-						rows Ls [pdi1 ... pdi2-1] are in the range k1 to k2-1.  Since d
-						 affects s, this set cannot be empty.
-						
+			rows Ls [pdi1 ... pdi2-1] are in the range k1 to k2-1.  Since d
+			 affects s, this set cannot be empty.
 			*/
 			;
 			;
@@ -822,28 +695,24 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 			/* construct the update matrix C for this supernode d */
 			/* -------------------------------------------------------------- */
 			/*
-			
-						C = L (k1:n-1, kd1:kd2-1) L (k1:k2-1, kd1:kd2-1)', except
-						 that k1:n-1 refers to all of the rows in L, but many of the
-						                    * rows are all zero.  Supernode d holds columns kd1 to kd2-1 of L.
-						                    * Nonzero rows in the range k1:k2-1 are in the list
-						                    * Ls [pdi1 ... pdi2-1], of size ndrow1.  Nonzero rows in the range
-						                    * k2:n-1 are in the list Ls [pdi2 ... pdend], of size ndrow2.  Let
-						                    * L1 = L (Ls [pdi1 ... pdi2-1], kd1:kd2-1), and let
-						                    * L2 = L (Ls [pdi2 ... pdend],  kd1:kd2-1).  C is ndrow2-by-ndrow1.
-						                    * Let C1 be the first ndrow1 rows of C and let C2 be the last
-						                    * ndrow2-ndrow1 rows of C.  Only the lower triangular part of C1
-						                    * needs to be computed since C1 is symmetric.
-						                   
-						
+			C = L (k1:n-1, kd1:kd2-1) L (k1:k2-1, kd1:kd2-1)', except
+			                    * that k1:n-1 refers to all of the rows in L, but many of the
+			                    * rows are all zero.  Supernode d holds columns kd1 to kd2-1 of L.
+			                    * Nonzero rows in the range k1:k2-1 are in the list
+			                    * Ls [pdi1 ... pdi2-1], of size ndrow1.  Nonzero rows in the range
+			                    * k2:n-1 are in the list Ls [pdi2 ... pdend], of size ndrow2.  Let
+			                    * L1 = L (Ls [pdi1 ... pdi2-1], kd1:kd2-1), and let
+			                    * L2 = L (Ls [pdi2 ... pdend],  kd1:kd2-1).  C is ndrow2-by-ndrow1.
+			                    * Let C1 be the first ndrow1 rows of C and let C2 be the last
+			                    * ndrow2-ndrow1 rows of C.  Only the lower triangular part of C1
+			                    * needs to be computed since C1 is symmetric.
+			                   
 			*/
 			/* maxcsize is the largest size of C for all pairs (d,s) */
 			;
 			/*
-			
-						compute leading ndrow1-by-ndrow1 lower triangular block of C,
-						 C1 = L1L1'
-						
+			compute leading ndrow1-by-ndrow1 lower triangular block of C,
+			 C1 = L1*L1'
 			*/
 			ndrow3=(ndrow2-ndrow1);
 			/* number of rows of C2 */
@@ -855,6 +724,7 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 				tstart=SuiteSparse_time();
 				{
 					int N = ndrow1, K = ndcol, LDA = ndrow, LDC = ndrow2;
+					;
 					/* N, K: L1 is ndrow1-by-ndcol */
 					/* ALPHA:  1 */
 					/* A, LDA: L1, ndrow */
@@ -865,10 +735,8 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 				/* C, LDC: C1 */
 				Common->cholmod_cpu_syrk_time+=(SuiteSparse_time()-tstart);
 				/*
-				
-								compute remaining (ndrow2-ndrow1)-by-ndrow1 block of C,
-								 C2 = L2L1'
-								
+				compute remaining (ndrow2-ndrow1)-by-ndrow1 block of C,
+				 C2 = L2*L1'
 				*/
 				if (ndrow3>0)
 				{
@@ -878,10 +746,11 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 						/* A, LDA: L2 */
 						/* B, LDB: L1 */
 						/* C, LDC: C2 */
+						int M = ndrow3, N = ndrow1, K = ndcol, LDA = ndrow, LDB = ndrow, LDC = ndrow2;
 						/* A, LDA: L2 */
 						/* B, LDB: L1 */
 						/* C, LDC: C2 */
-						int M = ndrow3, N = ndrow1, K = ndcol, LDA = ndrow, LDB = ndrow, LDC = ndrow2;
+						;
 						/* M, N, K */
 						/* ALPHA:  1 */
 						/* ndrow */
@@ -893,7 +762,7 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 					Common->cholmod_cpu_gemm_time+=(SuiteSparse_time()-tstart);
 				}
 				/* gettimeofday(&ed, NULL); */
-				/* sum3 += (ed.tv_sec + (double)ed.tv_usec1000000) - (st.tv_sec + (double)st.tv_usec1000000);        */
+				/* sum3 += (ed.tv_sec + (double)ed.tv_usec1000000) - (st.tv_sec + (double)st.tv_usec/1000000);        */
 				/* ---------------------------------------------------------- */
 				/* construct relative map to assemble d into s */
 				/* ---------------------------------------------------------- */
@@ -903,13 +772,9 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 					break;
 				}
 				/* #pragma omp parallel for num_threads(CHOLMOD_OMP_NUM_THREADS)               if ( ndrow2 > 64 )schedule(dynamic) */
-				#pragma loop name cholmod_super_numeric#3#7 
-				#pragma cetus private(i) 
-				#pragma cetus parallel 
 				#pragma cetus private(i) 
 				#pragma loop name cholmod_super_numeric#3#7 
 				#pragma cetus parallel 
-				/* #pragma omp parallel for if(() private(i) */
 				#pragma omp parallel for if((10000<(1L+(4L*ndrow2)))) private(i)
 				for (i=0; i<ndrow2; i ++ )
 				{
@@ -922,27 +787,20 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 				/*   gettimeofday(&init, NULL); */
 				/* #pragma omp parallel for private ( j, i, px, q )                                        num_threads(CHOLMOD_OMP_NUM_THREADS) */
 				/* cols k1:k2-1 */
+				#pragma cetus private(i, i_0, j, px, q) 
 				#pragma loop name cholmod_super_numeric#3#8 
 				/* #pragma cetus reduction(+: )  */
-				#pragma cetus private(i, i_0, j, px, q) 
-				#pragma cetus private(i, i_0, j, px, q) 
-				#pragma loop name cholmod_super_numeric#3#8 
-				/* #pragma cetus reduction(+: Lx[q])  */
 				for (j=0; j<ndrow1; j ++ )
 				{
 					/* printf("executed\n"); */
 					px=(psx+(RelativeMap[j]*nsrow));
 					/* rows k1:n-1 */
 					/* Normalized Loop */
-					#pragma loop name cholmod_super_numeric#3#8#0 
-					/* #pragma cetus reduction(+: Lx[q])  */
-					#pragma cetus private(q) 
-					#pragma cetus lastprivate(i_0) 
 					#pragma cetus private(q) 
 					#pragma cetus lastprivate(i_0) 
 					#pragma loop name cholmod_super_numeric#3#8#0 
 					/* #pragma cetus reduction(+: Lx[q])  */
-					for (i_0=0; i_0<=((( - 1)+(( - 1)*j))+ndrow2); i_0 ++ )
+					for (i_0=0; i_0<=((-1+(-1*j))+ndrow2); i_0 ++ )
 					{
 						q=(px+RelativeMap[i_0+j]);
 						Lx[q]-=Cw[(i_0+j)+(ndrow2*j)];
@@ -950,7 +808,7 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 					i=(i_0+j);
 				}
 				/* gettimeofday(&stop, NULL); */
-				/* sum1 += (stop.tv_sec + (double)stop.tv_usec1000000) - (init.tv_sec + (double)init.tv_usec1000000);        */
+				/* sum1 += (stop.tv_sec + (double)stop.tv_usec1000000) - (init.tv_sec + (double)init.tv_usec/1000000);        */
 			}
 			/* -------------------------------------------------------------- */
 			/* prepare this supernode d for its next ancestor */
@@ -959,12 +817,10 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 			if ( ! repeat_supernode)
 			{
 				/*
-				
-								If node s is being repeated, Head [dancestor] has already
-								 been cleared (set to EMPTY).  It must remain EMPTY.  The
-								 dancestor will not be factorized since the factorization
-								                        * terminates at node s.
-								
+				If node s is being repeated, Head [dancestor] has already
+				 been cleared (set to EMPTY).  It must remain EMPTY.  The
+				                        * dancestor will not be factorized since the factorization
+				                        * terminates at node s.
 				*/
 				Lpos[d]=(pdi2-pdi);
 				if (Lpos[d]<ndrow)
@@ -982,18 +838,16 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 		/* factorize diagonal block of supernode s in LL' */
 		/* ------------------------------------------------------------------ */
 		/*
-		
-				The current supernode s is ready to factorize.  It has been updated
-				 by all descendant supernodes.  Let S = the current supernode, which
-				 holds rows k1:n-1 and columns k1:k2-1 of the updated matrix.   It
-				                * splits into two parts:  the square diagonal block S1, and the
-				                * rectangular part S2.  Here, S1 is factorized into L1*L1' and
-				                * overwritten by L1.
-				                *
-				                * If supernode s is being repeated, only factorize it up to but not
-				                * including the column containing the problematic entry.
-				               
-				
+		The current supernode s is ready to factorize.  It has been updated
+		 by all descendant supernodes.  Let S = the current supernode, which
+		                * holds rows k1:n-1 and columns k1:k2-1 of the updated matrix.   It
+		                * splits into two parts:  the square diagonal block S1, and the
+		                * rectangular part S2.  Here, S1 is factorized into L1*L1' and
+		                * overwritten by L1.
+		                *
+		                * If supernode s is being repeated, only factorize it up to but not
+		                * including the column containing the problematic entry.
+		               
 		*/
 		nscol2=(repeat_supernode ? nscol_new : nscol);
 		/*  gettimeofday(&begin, NULL); */
@@ -1003,6 +857,7 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 			tstart=SuiteSparse_time();
 			{
 				int N = nscol2, LDA = nsrow, INFO = 1;
+				;
 				/* N: nscol2 */
 				dpotrf_("L",  & N, Lx+(1*psx),  & LDA,  & INFO);
 				/* A, LDA: S1, nsrow */
@@ -1013,7 +868,7 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 			Common->cholmod_cpu_potrf_time+=(SuiteSparse_time()-tstart);
 		}
 		/* gettimeofday(&terminate, NULL); */
-		/* sum2 += (terminate.tv_sec + (double)terminate.tv_usec1000000) - (begin.tv_sec + (double)begin.tv_usec1000000);        */
+		/* sum2 += (terminate.tv_sec + (double)terminate.tv_usec1000000) - (begin.tv_sec + (double)begin.tv_usec/1000000);        */
 		/* ------------------------------------------------------------------ */
 		/* check if the matrix is not positive definite */
 		/* ------------------------------------------------------------------ */
@@ -1025,15 +880,11 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 			pend=(psx+(nsrow*nscol));
 			/* s is nsrow-by-nscol */
 			/* Normalized Loop */
-			#pragma loop name cholmod_super_numeric#3#9 
-			#pragma cetus lastprivate(p_2) 
-			#pragma cetus parallel 
 			#pragma cetus lastprivate(p_2) 
 			#pragma loop name cholmod_super_numeric#3#9 
 			#pragma cetus parallel 
-			/* #pragma omp parallel for if(() lastprivate(p_2) */
 			#pragma omp parallel for if((10000<((1L+((3L*nscol)*nsrow))+((-3L*nscol_new)*nsrow)))) lastprivate(p_2)
-			for (p_2=0; p_2<=(((( - 1)+pend)+(( - 1)*psx))+((( - 1)*nscol_new)*nsrow)); p_2 ++ )
+			for (p_2=0; p_2<=(((-1+pend)+(-1*psx))+((-1*nscol_new)*nsrow)); p_2 ++ )
 			{
 				/* Lx [p] = 0 ; */
 				Lx[(p_2+psx)+(nscol_new*nsrow)]=0;
@@ -1041,42 +892,32 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 			p=((p_2+psx)+(nscol_new*nsrow));
 		}
 		/*
-		
-				info is set to one in LAPACK_potrf if blas_ok is FALSE.  It is
-				 set to zero in dpotrf/zpotrf if the factorization was successful.
-				
+		info is set to one in LAPACK_potrf if blas_ok is FALSE.  It is
+		                * set to zero in dpotrf/zpotrf if the factorization was successful.
 		*/
 		;
 		if (info!=0)
 		{
 			/*
-			
-						Matrix is not positive definite.  dpotrfzpotrf do NOT report an
-						 error if the diagonal of L has NaN's, only if it has a zero.
-						
+			Matrix is not positive definite.  dpotrfzpotrf do NOT report an
+			                    * error if the diagonal of L has NaN's, only if it has a zero.
 			*/
 			if (Common->status==0)
 			{
 				cholmod_error(1, "cholmod_super_numeric.c", 1025, "matrix not positive definite", Common);
 			}
 			/*
-			
-						L->minor is the column of L that contains a zero or negative
-						 diagonal term.
-						
+			L->minor is the column of L that contains a zero or negative
+			 diagonal term.
 			*/
 			L->minor=((k1+info)-1);
 			/* clear the link lists of all subsequent supernodes */
 			/* Normalized Loop */
-			#pragma loop name cholmod_super_numeric#3#10 
-			#pragma cetus lastprivate(ss_0) 
-			#pragma cetus parallel 
 			#pragma cetus lastprivate(ss_0) 
 			#pragma loop name cholmod_super_numeric#3#10 
 			#pragma cetus parallel 
-			/* #pragma omp parallel for if(() lastprivate(ss_0) */
 			#pragma omp parallel for if((10000<((-2L+(3L*nsuper))+(-3L*s)))) lastprivate(ss_0)
-			for (ss_0=0; ss_0<=((( - 2)+nsuper)+(( - 1)*s)); ss_0 ++ )
+			for (ss_0=0; ss_0<=((-2+nsuper)+(-1*s)); ss_0 ++ )
 			{
 				Head[(1+s)+ss_0]=( - 1);
 			}
@@ -1084,55 +925,45 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 			/* zero this supernode, and all remaining supernodes */
 			pend=L->xsize;
 			/* Normalized Loop */
-			#pragma loop name cholmod_super_numeric#3#11 
-			#pragma cetus lastprivate(p_3) 
-			#pragma cetus parallel 
 			#pragma cetus lastprivate(p_3) 
 			#pragma loop name cholmod_super_numeric#3#11 
 			#pragma cetus parallel 
-			/* #pragma omp parallel for if(() lastprivate(p_3) */
 			#pragma omp parallel for if((10000<((1L+(3L*pend))+(-3L*psx)))) lastprivate(p_3)
-			for (p_3=0; p_3<=((( - 1)+pend)+(( - 1)*psx)); p_3 ++ )
+			for (p_3=0; p_3<=((-1+pend)+(-1*psx)); p_3 ++ )
 			{
 				/* Lx [p] = 0. ; */
 				Lx[p_3+psx]=0;
 			}
 			p=(p_3+psx);
 			/*
-			
-						If L is indefinite, it still contains useful information.
-						 Supernodes 0 to s-1 are valid, similar to MATLAB [R,p]=chol(A),
-						 where the 1-based p is identical to the 0-based L->minor.  Since
-						                    * L->minor is in the current supernode s, it and any columns to the
-						                    * left of it in supernode s are also all zero.  This differs from
-						                    * [R,p]=chol(A), which contains nonzero rows 1 to p-1.  Fix this
-						                    * by setting repeat_supernode to TRUE, and repeating supernode s.
-						                    *
-						                    * If Common->quick_return_if_not_posdef is true, then the entire
-						                    * supernode s is not factorized; it is left as all zero.
-						                   
-						
+			If L is indefinite, it still contains useful information.
+			 Supernodes 0 to s-1 are valid, similar to MATLAB [R,p]=chol(A),
+			                    * where the 1-based p is identical to the 0-based L->minor.  Since
+			                    * L->minor is in the current supernode s, it and any columns to the
+			                    * left of it in supernode s are also all zero.  This differs from
+			                    * [R,p]=chol(A), which contains nonzero rows 1 to p-1.  Fix this
+			                    * by setting repeat_supernode to TRUE, and repeating supernode s.
+			                    *
+			                    * If Common->quick_return_if_not_posdef is true, then the entire
+			                    * supernode s is not factorized; it is left as all zero.
+			                   
 			*/
 			if ((info==1)||Common->quick_return_if_not_posdef)
 			{
 				/*
-				
-								If the first column of supernode s contains a zero or
-								 negative diagonal entry, then it is already properly set to
-								 zero.  Also, info will be 1 if integer overflow occured in
-								                        * the BLAS.
-								
+				If the first column of supernode s contains a zero or
+				 negative diagonal entry, then it is already properly set to
+				                        * zero.  Also, info will be 1 if integer overflow occured in
+				                        * the BLAS.
 				*/
 				Head[s]=( - 1);
 			}
 			else
 			{
 				/*
-				
-								Repeat supernode s, but only factorize it up to but not
-								 including the column containing the problematic diagonal
-								 entry.
-								
+				Repeat supernode s, but only factorize it up to but not
+				 including the column containing the problematic diagonal
+				                        * entry.
 				*/
 				repeat_supernode=1;
 				s -- ;
@@ -1147,15 +978,13 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 		if (nsrow2>0)
 		{
 			/*
-			
-						The current supernode is columns k1 to k2-1 of L.  Let L1 be the
-						 diagonal block (factorized by dpotrfzpotrf above; rows/cols
-						                    * k1:k2-1), and L2 be rows k2:n-1 and columns k1:k2-1 of L.  The
-						                    * triangular system to solve is L2*L1' = S2, where S2 is
-						                    * overwritten with L2.  More precisely, L2 = S2 / L1' in MATLAB
-						                    * notation.
-						                   
-						
+			The current supernode is columns k1 to k2-1 of L.  Let L1 be the
+			 diagonal block (factorized by dpotrf/zpotrf above; rows/cols
+			                    * k1:k2-1), and L2 be rows k2:n-1 and columns k1:k2-1 of L.  The
+			                    * triangular system to solve is L2*L1' = S2, where S2 is
+			                    * overwritten with L2.  More precisely, L2 = S2 / L1' in MATLAB
+			                    * notation.
+			                   
 			*/
 			/* gettimeofday(&st, NULL); */
 			{
@@ -1163,8 +992,9 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 				tstart=SuiteSparse_time();
 				{
 					/* B, LDB, L2, nsrow */
-					/* B, LDB, L2, nsrow */
 					int M = nsrow2, N = nscol2, LDA = nsrow, LDB = nsrow;
+					/* B, LDB, L2, nsrow */
+					;
 					/* M, N */
 					/* ALPHA: 1 */
 					/* A, LDA: L1, nsrow */
@@ -1174,7 +1004,7 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 				Common->cholmod_cpu_trsm_time+=(SuiteSparse_time()-tstart);
 			}
 			/* gettimeofday(&ed, NULL); */
-			/* sum3 += (ed.tv_sec + (double)ed.tv_usec1000000) - (st.tv_sec + (double)st.tv_usec1000000);        */
+			/* sum3 += (ed.tv_sec + (double)ed.tv_usec1000000) - (st.tv_sec + (double)st.tv_usec/1000000);        */
 			;
 			if ( ! repeat_supernode)
 			{
@@ -1203,10 +1033,8 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 		if (repeat_supernode)
 		{
 			/*
-			
-						matrix is not positive definite; finished clean-up for supernode
-						 containing negative diagonal
-						
+			matrix is not positive definite; finished clean-up for supernode
+			 containing negative diagonal
 			*/
 			return (Common->status>=0);
 		}
@@ -1216,7 +1044,7 @@ int CHOLMOD(super_numeric)(cholmod_sparse * A, cholmod_sparse * F, double beta[2
 	printf("Time taken by 1st subsub loop = %lf s\n", sum);
 	printf("Time taken by 2nd subsub loop = %lf s\n", sum1);
 	printf("Time taken by lapack+BLAS routines = %lf s\n", sum2+sum3);
-	printf("Total Computation time: %lf s\n", ((sum+sum1)+sum2)+sum3);
+	printf("Time taken by kernel= %lf s\n", ((sum+sum1)+sum2)+sum3);
 	ok=0;
 	/* ---------------------------------------------------------------------- */
 	/* clear Common workspace, free temp workspace C, and return */

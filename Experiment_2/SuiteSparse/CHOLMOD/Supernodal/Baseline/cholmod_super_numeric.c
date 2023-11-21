@@ -505,7 +505,7 @@ int CHOLMOD(super_numeric)
                 pk = psx ;
 
                // stype = 0;
-          // gettimeofday(&start,NULL);
+           gettimeofday(&start,NULL);
         // #pragma omp parallel for private ( p, pend, pfend, pf, i, j, imap, q )  \
         //     num_threads(CHOLMOD_OMP_NUM_THREADS) if ( k2-k1 > 64 )
                 for (k = k1 ; k < k2 ; k++)
@@ -533,9 +533,9 @@ int CHOLMOD(super_numeric)
 
                 }
 
-            // gettimeofday(&end, NULL);
+             gettimeofday(&end, NULL);
 
-            // sum += (end.tv_sec + (double)end.tv_usec/1000000) - (start.tv_sec + (double)start.tv_usec/1000000);       
+             sum += (end.tv_sec + (double)end.tv_usec/1000000) - (start.tv_sec + (double)start.tv_usec/1000000);       
 	
 
            
@@ -780,7 +780,7 @@ int CHOLMOD(super_numeric)
                         }
                     }
         #endif
-               // gettimeofday(&st, NULL);
+                gettimeofday(&st, NULL);
 
                 {
                         /* GPU not installed, or not used */
@@ -828,9 +828,9 @@ int CHOLMOD(super_numeric)
         #endif
                         } 
             
-                        // gettimeofday(&ed, NULL);
+                         gettimeofday(&ed, NULL);
 
-		                // sum3 += (ed.tv_sec + (double)ed.tv_usec/1000000) - (st.tv_sec + (double)st.tv_usec/1000000);       
+		                 sum3 += (ed.tv_sec + (double)ed.tv_usec/1000000) - (st.tv_sec + (double)st.tv_usec/1000000);       
 
                         /* ---------------------------------------------------------- */
                         /* construct relative map to assemble d into s */
@@ -857,7 +857,7 @@ int CHOLMOD(super_numeric)
                         /* assemble C into supernode s using the relative map */
                         /* ---------------------------------------------------------- */
             
-                      //   gettimeofday(&init, NULL);
+                         gettimeofday(&init, NULL);
                     // #pragma omp parallel for private ( j, i, px, q )                \
                     //     num_threads(CHOLMOD_OMP_NUM_THREADS)
                         for (j = 0 ; j < ndrow1 ; j++)              /* cols k1:k2-1 */
@@ -873,9 +873,9 @@ int CHOLMOD(super_numeric)
                         
                         }
 
-                        // gettimeofday(&stop, NULL);
+                         gettimeofday(&stop, NULL);
 
-                        // sum1 += (stop.tv_sec + (double)stop.tv_usec/1000000) - (init.tv_sec + (double)init.tv_usec/1000000);       
+                         sum1 += (stop.tv_sec + (double)stop.tv_usec/1000000) - (init.tv_sec + (double)init.tv_usec/1000000);       
 
                     }
         #ifdef GPU_BLAS
@@ -947,7 +947,7 @@ int CHOLMOD(super_numeric)
 
                 nscol2 = (repeat_supernode) ? (nscol_new) : (nscol) ;
 
-          //  gettimeofday(&begin, NULL);
+            gettimeofday(&begin, NULL);
         #ifdef GPU_BLAS
                 if ( !useGPU
                     || !supernodeUsedGPU
@@ -974,9 +974,9 @@ int CHOLMOD(super_numeric)
         #endif
                 }
 
-            // gettimeofday(&terminate, NULL);
+             gettimeofday(&terminate, NULL);
 
-            // sum2 += (terminate.tv_sec + (double)terminate.tv_usec/1000000) - (begin.tv_sec + (double)begin.tv_usec/1000000);       
+             sum2 += (terminate.tv_sec + (double)terminate.tv_usec/1000000) - (begin.tv_sec + (double)begin.tv_usec/1000000);       
 
                 /* ------------------------------------------------------------------ */
                 /* check if the matrix is not positive definite */
@@ -1082,7 +1082,7 @@ int CHOLMOD(super_numeric)
                     * overwritten with L2.  More precisely, L2 = S2 / L1' in MATLAB
                     * notation.
                     */
-                   // gettimeofday(&st, NULL);
+                    gettimeofday(&st, NULL);
                     {
         #ifndef NTIMER
                         Common->CHOLMOD_CPU_TRSM_CALLS++ ;
@@ -1100,9 +1100,9 @@ int CHOLMOD(super_numeric)
                         Common->CHOLMOD_CPU_TRSM_TIME += SuiteSparse_time () - tstart ;
         #endif
                     }
-                    // gettimeofday(&ed, NULL);
+                     gettimeofday(&ed, NULL);
 
-		            // sum3 += (ed.tv_sec + (double)ed.tv_usec/1000000) - (st.tv_sec + (double)st.tv_usec/1000000);       
+		             sum3 += (ed.tv_sec + (double)ed.tv_usec/1000000) - (st.tv_sec + (double)st.tv_usec/1000000);       
 
                     
 
@@ -1165,7 +1165,7 @@ int CHOLMOD(super_numeric)
             printf("Time taken by 1st subsub loop = %lf s\n",sum);
             printf("Time taken by 2nd subsub loop = %lf s\n",sum1);
             printf("Time taken by lapack+BLAS routines = %lf s\n",sum2+sum3);
-            printf("Total Computation time: %lf s\n", sum+sum1+sum2+sum3);
+            printf("Time taken by kernel= %lf s\n", sum+sum1+sum2+sum3);
 
 
         #ifdef GPU_BLAS

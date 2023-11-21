@@ -126,6 +126,7 @@ def execute_Other_Benchmark(executable_path,input_path,iters,executable):
         exec_command = executable_path
     else:
         exec_command = [executable_path,input_path]
+
    
     for i in range(0,iters):
         exec_result = Popen(exec_command,stdout=PIPE,stderr=PIPE)
@@ -133,6 +134,7 @@ def execute_Other_Benchmark(executable_path,input_path,iters,executable):
                 
         output = str(output,'UTF-8')
         error = str(err_val, 'UTF-8')
+        
         if(isinstance(output,str)):
             search = re.search('kernel=(.*) s', output)
             wall_time = [float(i) for i in re.findall("\d+\.\d+", search.group(1))]
@@ -395,6 +397,56 @@ def run_Other_Benchmark(benchmark,Exp2_directory,iters,path_to_reports_dir,execu
     return
 
 
+#CHOLMOD Supernodal within SuiteSparse handled separately
+def run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executable,input_mat):
+
+    #If the user wants to run the experiment for all the input files
+
+    head_String = "\n===============Timing Results for the "+ benchmark +" benchmark(Average of "+ str(iters)+" runs)===============\n\n"
+
+    #Set the path of the baseline codes
+    base_path = Exp2_directory + benchmark + '/CHOLMOD/'
+
+    Supernodal_path = base_path + '/Supernodal/'
+
+    #Set the path to Cetus output
+    cetus_output_path = Supernodal_path + 'cetus_output/'
+
+    file = 'cholmod_super_numeric.c'
+    #Path to baselin and optimized cholmod_super_numeric files
+    Baseline_file_direc = Supernodal_path + 'Baseline/'
+    BaseTech_CetusOut_file_direc = 'BaseTech/'
+    NewTech_CetusOut_file_direc = 'NewTech/'
+
+    #Compile and run the baseline code
+
+    #Move the file into the playground
+    utils.move_file(Baseline_file_direc+file,Supernodal_path)
+
+    #Compile the benchmark
+    compile_Other_Benchmark(base_path)
+
+    path_to_input = base_path + 'Demo/Matrix/' + input_mat
+    path_to_executable = base_path + 'Demo/'
+
+    #Execute the benchmark and record the time
+    app_time,percent_var = execute_Other_Benchmark(path_to_executable,path_to_input,iters,executable)
+
+    print("Baseline time =", app_time, "s")
+    print("Variation =",percent_var, "%")
+
+    #Move the file back to its original location
+    utils.move_file(Supernodal_path+file,Baseline_file_direc)
+    
+     #Clean the object files
+    os.chdir(base_path)
+    Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
+    
+    return
+
+
+
+
 
 #Driver code to execute the Polybench benchmarks
 def drive_poly(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks):
@@ -423,7 +475,7 @@ def drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_bench
 
     #Set the input class to be used and executable for each benchmark
         input_class = ''
-        baseline_executable = ''
+        executable = ''
         if(benchmark == 'UA'):
             input_class = 'A'
             executable = 'ua.' + input_class + '.x'
@@ -467,6 +519,12 @@ def drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_ben
             input_mat = 'crankseg_1.mtx'
         elif(benchmark == 'amgmk'):
             executable = 'AMGMk'
+        elif(benchmark == 'SuiteSparse'):
+            executable = 'cholmod_demo'
+            input_mat = 'spal_004.mtx'
+            run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executable,input_mat)
+            os.chdir(root_directory)
+            continue
         
         run_Other_Benchmark(benchmark,Exp2_directory,iters,path_to_reports_dir,executable,input_mat)
 
@@ -489,7 +547,7 @@ def RunExp(root_directory):
     #Benchmarks in a dictionary. They are grouped according to the suite they belong.
     #Grouping helps in seamleass compilation and execution.
     benchmarks_dict = {'poly':['fdtd-2d','heat-3d', 'gramschmidt', 'syrk'],
-                        'NAS':['CG', 'MG', 'UA', 'IS'], 'Other':['amgmk']}
+                        'NAS':['CG', 'MG', 'UA', 'IS'], 'Other':['SuiteSparse']}
     
 
     benchmark_tags = list(benchmarks_dict.keys())
@@ -499,11 +557,11 @@ def RunExp(root_directory):
         # if(tag == 'poly'):
         #     drive_poly(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
 
-        if(tag == 'NAS'):
-            drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
+        # if(tag == 'NAS'):
+        #     drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
 
-        # if(tag == 'Other'):
-        #     drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
+        if(tag == 'Other'):
+            drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
 
 
     print("Experiment finished and Results written to the Reports directory!!")

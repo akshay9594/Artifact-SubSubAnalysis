@@ -1,5 +1,5 @@
 
-import math
+import math,shutil
 
 #Calculates run-to-run variation (%)
 def calculate_variation(values_list, mean):
@@ -12,3 +12,7 @@ def calculate_variation(values_list, mean):
     standard_dev = math.sqrt(sum_of_squares/len(values_list))
     percent_dev = (100*standard_dev)/mean 
     return percent_dev
+
+
+def move_file(source,destination):
+    shutil.move(source,destination)

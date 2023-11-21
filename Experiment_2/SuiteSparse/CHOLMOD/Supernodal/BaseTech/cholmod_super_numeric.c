@@ -1044,7 +1044,7 @@ int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2]
 	printf("Time taken by 1st subsub loop = %lf s\n", sum);
 	printf("Time taken by 2nd subsub loop = %lf s\n", sum1);
 	printf("Time taken by lapack+BLAS routines = %lf s\n", sum2+sum3);
-	printf("Total Computation time: %lf s\n", ((sum+sum1)+sum2)+sum3);
+	printf("Time taken by kernel= %lf s\n", ((sum+sum1)+sum2)+sum3);
 	ok=0;
 	/* ---------------------------------------------------------------------- */
 	/* clear Common workspace, free temp workspace C, and return */
