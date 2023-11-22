@@ -101,7 +101,7 @@ Computes the Cholesky factorization of A+betaI or A*F+beta*I.  Only the
 #include "cholmod_internal.h"
 #include "cholmod_supernodal.h"
 #include <stdio.h>
-/* #include <omp.h>
+#include <omp.h>
 #include <stdlib.h>
 #include <assert.h>
 #include "cholmod_template.h"
@@ -133,7 +133,17 @@ Returns TRUE if successful, or if the matrix is not positive definite.
 /* ---- inout --- */
 /* factorization */
 /* --------------- */
-int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2], cholmod_factor * L, cholmod_common * Common)
+int CHOLMOD(super_numeric)
+(
+    /* ---- input ---- */
+    cholmod_sparse *A,	/* matrix to factorize */
+    cholmod_sparse *F,	/* F = A' or A(:,f)' */
+    double beta [2],	/* beta*I is added to diagonal of matrix to factorize */
+    /* ---- in/out --- */
+    cholmod_factor *L,	/* factorization */
+    /* --------------- */
+    cholmod_common *Common
+)
 {
 	cholmod_dense * C;
 	int * Super, * Map, * SuperMap;
@@ -340,8 +350,7 @@ int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2]
 	{
 		
 	}
-	printf("\n********************************************************\n");
-	printf("Threads : %d\n", 8);
+	
 	/* ---------------------------------------------------------------------- */
 	/* get workspace */
 	/* ---------------------------------------------------------------------- */
@@ -545,7 +554,7 @@ int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2]
 		/* ------------------------------------------------------------------ */
 		pk=psx;
 		/* stype = 0; */
-		/* gettimeofday(&start,NULL); */
+		gettimeofday(&start,NULL);
 		/* #pragma omp parallel for private ( p, pend, pfend, pf, i, j, imap, q )              num_threads(CHOLMOD_OMP_NUM_THREADS) if ( k2-k1 > 64 ) */
 		/* Normalized Loop */
 		#pragma cetus private(fjk, j, p, p_1, pf, pf_0) 
@@ -586,8 +595,8 @@ int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2]
 			pf=(pf_0+Fp[k1+k_1]);
 		}
 		k=(k1+k_1);
-		/* gettimeofday(&end, NULL); */
-		/* sum += (end.tv_sec + (double)end.tv_usec1000000) - (start.tv_sec + (double)start.tv_usec/1000000);        */
+		gettimeofday(&end, NULL);
+		sum += (end.tv_sec + (double)end.tv_usec/1000000) - (start.tv_sec + (double)start.tv_usec/1000000);
 		/* add beta to the diagonal of the supernode, if nonzero */
 		if (beta[0]!=0.0)
 		{
@@ -717,7 +726,7 @@ int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2]
 			ndrow3=(ndrow2-ndrow1);
 			/* number of rows of C2 */
 			;
-			/* gettimeofday(&st, NULL); */
+			gettimeofday(&st, NULL);
 			{
 				/* GPU not installed, or not used */
 				Common->cholmod_cpu_syrk_calls ++ ;
@@ -761,8 +770,8 @@ int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2]
 					;
 					Common->cholmod_cpu_gemm_time+=(SuiteSparse_time()-tstart);
 				}
-				/* gettimeofday(&ed, NULL); */
-				/* sum3 += (ed.tv_sec + (double)ed.tv_usec1000000) - (st.tv_sec + (double)st.tv_usec/1000000);        */
+				gettimeofday(&ed, NULL);
+				sum3 += (ed.tv_sec + (double)ed.tv_usec/1000000) - (st.tv_sec + (double)st.tv_usec/1000000);
 				/* ---------------------------------------------------------- */
 				/* construct relative map to assemble d into s */
 				/* ---------------------------------------------------------- */
@@ -784,7 +793,7 @@ int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2]
 				/* ---------------------------------------------------------- */
 				/* assemble C into supernode s using the relative map */
 				/* ---------------------------------------------------------- */
-				/*   gettimeofday(&init, NULL); */
+				 gettimeofday(&init, NULL);
 				/* #pragma omp parallel for private ( j, i, px, q )                                        num_threads(CHOLMOD_OMP_NUM_THREADS) */
 				/* cols k1:k2-1 */
 				#pragma cetus private(i, i_0, j, px, q) 
@@ -807,8 +816,8 @@ int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2]
 					}
 					i=(i_0+j);
 				}
-				/* gettimeofday(&stop, NULL); */
-				/* sum1 += (stop.tv_sec + (double)stop.tv_usec1000000) - (init.tv_sec + (double)init.tv_usec/1000000);        */
+				gettimeofday(&stop, NULL);
+				sum1 += (stop.tv_sec + (double)stop.tv_usec/1000000) - (init.tv_sec + (double)init.tv_usec/1000000);
 			}
 			/* -------------------------------------------------------------- */
 			/* prepare this supernode d for its next ancestor */
@@ -850,7 +859,7 @@ int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2]
 		               
 		*/
 		nscol2=(repeat_supernode ? nscol_new : nscol);
-		/*  gettimeofday(&begin, NULL); */
+		gettimeofday(&begin, NULL);
 		{
 			/* Note that the GPU will not be used for the triangular solve */
 			Common->cholmod_cpu_potrf_calls ++ ;
@@ -867,8 +876,8 @@ int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2]
 			/* INFO */
 			Common->cholmod_cpu_potrf_time+=(SuiteSparse_time()-tstart);
 		}
-		/* gettimeofday(&terminate, NULL); */
-		/* sum2 += (terminate.tv_sec + (double)terminate.tv_usec1000000) - (begin.tv_sec + (double)begin.tv_usec/1000000);        */
+		gettimeofday(&terminate, NULL);
+		sum2 += (terminate.tv_sec + (double)terminate.tv_usec/1000000) - (begin.tv_sec + (double)begin.tv_usec/1000000);
 		/* ------------------------------------------------------------------ */
 		/* check if the matrix is not positive definite */
 		/* ------------------------------------------------------------------ */
@@ -986,7 +995,7 @@ int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2]
 			                    * notation.
 			                   
 			*/
-			/* gettimeofday(&st, NULL); */
+			gettimeofday(&st, NULL);
 			{
 				Common->cholmod_cpu_trsm_calls ++ ;
 				tstart=SuiteSparse_time();
@@ -1003,8 +1012,8 @@ int cholmod_super_numeric(cholmod_sparse * A, cholmod_sparse * F, double beta[2]
 				;
 				Common->cholmod_cpu_trsm_time+=(SuiteSparse_time()-tstart);
 			}
-			/* gettimeofday(&ed, NULL); */
-			/* sum3 += (ed.tv_sec + (double)ed.tv_usec1000000) - (st.tv_sec + (double)st.tv_usec/1000000);        */
+			gettimeofday(&ed, NULL);
+			sum3 += (ed.tv_sec + (double)ed.tv_usec/1000000) - (st.tv_sec + (double)st.tv_usec/1000000); 
 			;
 			if ( ! repeat_supernode)
 			{

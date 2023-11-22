@@ -8,6 +8,8 @@ import re,os,sys
 
 import utils
 
+
+
 #Compile the SDDMM benchmark
 def compile_poly(base_path):
     os.chdir(base_path)
@@ -58,6 +60,29 @@ def compile_Other_Benchmark(base_path):
         print("Compilation failed...")
         exit()
     return
+
+
+#Special routine to compile and execute CHOLMOD (SuiteSparse)
+def Compile_And_Execute_CHOLMOD(base_path,Supernodal_path,file_direc,file,input_mat,iters,executable):
+
+      #Path to the input and executable
+    path_to_input = base_path + 'Demo/Matrix/' + input_mat
+    path_to_executable = base_path + 'Demo/'
+
+     #Move the file into the playground
+    utils.move_file(file_direc+file,Supernodal_path)
+
+    #Compile the benchmark
+    compile_Other_Benchmark(base_path)
+
+    #Execute the benchmark and record the time
+    app_time,percent_var = execute_Other_Benchmark(path_to_executable,path_to_input,iters,executable)
+
+    #Move the file back to its original location
+    utils.move_file(Supernodal_path+file,file_direc)
+
+    return app_time,percent_var
+
 
 
 #Executing the Polybench benchmarks
@@ -397,6 +422,8 @@ def run_Other_Benchmark(benchmark,Exp2_directory,iters,path_to_reports_dir,execu
     return
 
 
+
+
 #CHOLMOD Supernodal within SuiteSparse handled separately
 def run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executable,input_mat):
 
@@ -409,39 +436,61 @@ def run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executabl
 
     Supernodal_path = base_path + '/Supernodal/'
 
-    #Set the path to Cetus output
-    cetus_output_path = Supernodal_path + 'cetus_output/'
-
     file = 'cholmod_super_numeric.c'
     #Path to baselin and optimized cholmod_super_numeric files
     Baseline_file_direc = Supernodal_path + 'Baseline/'
-    BaseTech_CetusOut_file_direc = 'BaseTech/'
-    NewTech_CetusOut_file_direc = 'NewTech/'
+    BaseTech_CetusOut_file_direc = Supernodal_path + 'BaseTech/'
+    NewTech_CetusOut_file_direc = Supernodal_path + 'NewTech/'
 
     #Compile and run the baseline code
 
-    #Move the file into the playground
-    utils.move_file(Baseline_file_direc+file,Supernodal_path)
+    with open(path_to_reports_dir+'/'+benchmark+'.txt', 'w') as f:
+        f.write(head_String)
+        f.write("(a) Baseline Code : Serial code\n")
+        f.write("(b) Optimized Code : Cetus Parallel code (with the base technique applied)\n")
+        f.write("                   : Cetus Parallel code (with the new technique applied)\n")
 
-    #Compile the benchmark
-    compile_Other_Benchmark(base_path)
+        f.write("\n--------------------------------------------------------------------------\n")
 
-    path_to_input = base_path + 'Demo/Matrix/' + input_mat
-    path_to_executable = base_path + 'Demo/'
+        time_baseline,percent_var = Compile_And_Execute_CHOLMOD(base_path,Supernodal_path,Baseline_file_direc,  
+                                                                file,input_mat,iters,executable)
 
-    #Execute the benchmark and record the time
-    app_time,percent_var = execute_Other_Benchmark(path_to_executable,path_to_input,iters,executable)
+        f.write("->Baseline execution time ="+ str(time_baseline)+" s " + "(" + str(percent_var)+" % variation)\n\n")
 
-    print("Baseline time =", app_time, "s")
-    print("Variation =",percent_var, "%")
+        #Clean the object files
+        os.chdir(base_path)
+        Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
 
-    #Move the file back to its original location
-    utils.move_file(Supernodal_path+file,Baseline_file_direc)
-    
-     #Clean the object files
-    os.chdir(base_path)
-    Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
-    
+        #Second, determine execution time and speedup of the Cetus parallel code with the Base Technique of [5] applied
+        time_BaseTech,percent_var =    Compile_And_Execute_CHOLMOD(base_path,Supernodal_path,BaseTech_CetusOut_file_direc,
+                                    file,input_mat,iters,executable)
+        
+        f.write("Execution time of code with Base Technique of [5] ="+ str(time_BaseTech)+" s " + "(" + str(percent_var)+" % variation)\n")
+
+        Base_Tech_speedup = time_baseline/time_BaseTech
+        f.write("->Base Technique Speedup="+str(Base_Tech_speedup)+"\n\n")
+
+
+        #Clean the object files
+        os.chdir(base_path)
+        Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
+
+        #Third, determine execution time and speedup of the Cetus parallel code with the New Technique of this paper applied
+        NewOptCode_time, percent_var = Compile_And_Execute_CHOLMOD(base_path,Supernodal_path,NewTech_CetusOut_file_direc,
+                                                                    file,input_mat,iters,executable)
+
+        f.write("Execution time of code with the Technique of this paper ="+ str(NewOptCode_time)+" s " + "(" + str(percent_var)+" % variation)\n")
+
+        New_Tech_speedup = time_baseline/NewOptCode_time
+        f.write("->New Technique Speedup="+str(New_Tech_speedup)+"\n\n")
+
+        #Clean the object files
+        os.chdir(base_path)
+        Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
+
+        f.write("\n-------------------------------------------------------------------------------\n")
+
+
     return
 
 
