@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
 
    col[num_cols]= col[num_cols - 1] + colCnt;//last col
 
-   int num_runs = 5;
+   int num_runs = 1;
    double seconds, total_time=0.0;
 
    for(k=0; k < num_runs; k++){

@@ -201,7 +201,7 @@ int main(int argc, char * argv[])
 	/* ,startTT, endTT; */
 	s_factor=100;
 	count=0;
-	num_runs=5;
+	num_runs=1;
 	fp=fopen(file_path, "r");
 	if (fp==((void * )0))
 	{

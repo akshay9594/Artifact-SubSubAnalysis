@@ -103,7 +103,7 @@ int main(int argc, char * argv[])
 	char matrix_details[100];
 	
 	int x, y, col_num = 0;
-	int num_runs = 5;
+	int num_runs = 1;
 	double seconds, total_time = 0.0;
 	if (argc<2)
 	{
