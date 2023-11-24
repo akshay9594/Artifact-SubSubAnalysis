@@ -5,8 +5,27 @@
 (b) Optimized Code : Cetus Parallel code (with technique applied)
 
 --------------------------------------------------------------------------
-->Baseline execution time =1.164788 s (0.0 % variation)
-->Optimized Code execution time =0.189821 s (0.0 % variation)
-->Speedup=6.136244145800517
+1. For matrix: gsm_106857
+->Baseline execution time =1.323684 s (0.0 % variation)
+->Optimized Code execution time =0.514238 s (0.0 % variation)
+->Speedup=2.5740688163846315
+
+-------------------------------------------------------------------------------
+2. For matrix: dielFilterV2clx
+->Baseline execution time =1.095788 s (0.0 % variation)
+->Optimized Code execution time =0.438478 s (0.0 % variation)
+->Speedup=2.4990717892345797
+
+-------------------------------------------------------------------------------
+3. For matrix: af_shell1
+->Baseline execution time =0.687965 s (0.0 % variation)
+->Optimized Code execution time =0.1382 s (0.0 % variation)
+->Speedup=4.9780390738060785
+
+-------------------------------------------------------------------------------
+4. For matrix: inline_1
+->Baseline execution time =1.514578 s (0.0 % variation)
+->Optimized Code execution time =0.494613 s (0.0 % variation)
+->Speedup=3.06214757800543
 
 -------------------------------------------------------------------------------

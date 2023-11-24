@@ -423,8 +423,17 @@ def run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executabl
 
     head_String = "\n===============Timing Results for the "+ benchmark +" benchmark(Average of "+ str(iters)+" runs)===============\n\n"
 
+    # Compile dependendent packages 
+    SuiteSparse_path = Exp2_directory + benchmark
+
+    dependent_packages = ['/AMD/','/CAMD/','/COLAMD/','/SuiteSparse_config/']
+
+    for package in dependent_packages:
+        compile_Other_Benchmark(SuiteSparse_path + package)
+
+
     #Set the path of the baseline codes
-    base_path = Exp2_directory + benchmark + '/CHOLMOD/'
+    base_path = SuiteSparse_path + '/CHOLMOD/'
 
     Supernodal_path = base_path + '/Supernodal/'
 
@@ -481,6 +490,12 @@ def run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executabl
         Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
 
         f.write("\n-------------------------------------------------------------------------------\n")
+
+    #Clean object files of dependent pacakges
+
+    for package in dependent_packages:
+        os.chdir(SuiteSparse_path+package)
+        Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
 
 
     return
@@ -595,7 +610,7 @@ def RunExp(root_directory):
     benchmarks_dict = {'poly':['fdtd-2d','heat-3d', 'gramschmidt', 'syrk'],
                         'NAS':['CG', 'MG', 'UA', 'IS'], 'Other':['SDDMM','ic0_csc','amgmk','SuiteSparse']}
   
-
+    #'Other':['SDDMM','ic0_csc','amgmk','SuiteSparse']
     benchmark_tags = list(benchmarks_dict.keys())
 
     for tag in benchmark_tags:

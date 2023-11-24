@@ -291,7 +291,7 @@ def run_exp_SDDMM(Exp1_directory,iters,path_to_reports_dir):
     #Set the path of the optimized codes
     opt_code_path = Exp1_directory+'SDDMM/Technique_Applied/'
 
-    input_directory = Exp1_directory +'SDDMM/Input/'
+    input_directory = os.getcwd() +'/input_matrices/'
 
 
     #Compile the baseline code
@@ -303,9 +303,9 @@ def run_exp_SDDMM(Exp1_directory,iters,path_to_reports_dir):
     os.chdir(base_path)
 
     #List of input matrices
-    #input_matrices = ['gsm_106857.mtx', 'dielFilterV2clx.mtx','af_shell1.mtx','inline_1.mtx']
+    input_matrices = ['gsm_106857', 'dielFilterV2clx','af_shell1','inline_1']
 
-    input_matrices = ['af_shell1.mtx']  
+    #input_matrices = ['af_shell1.mtx']  
 
 
     with open(path_to_reports_dir+'/SDDMM.txt', 'w') as f:
@@ -316,9 +316,15 @@ def run_exp_SDDMM(Exp1_directory,iters,path_to_reports_dir):
         f.write("\n--------------------------------------------------------------------------\n")
 
         # For each matrix,execute the baseline code and optimized code and calculate the speedup
-        for matrix in input_matrices:
+        for i in range(0,len(input_matrices)):
 
-            input_path = input_directory + matrix
+            matrix = input_matrices[i]
+
+            f.write(str(i+1)+". For matrix: "+ matrix+"\n")
+
+            #Path to the input matrix
+            input_path = input_directory + matrix + "/" + matrix + ".mtx"
+
             app_time, app_time_var, threads = execute_SDDMM(base_path,input_path,iters)
 
             f.write("->Baseline execution time ="+ str(app_time)+" s " + "(" + str(app_time_var)+" % variation)\n")
@@ -330,15 +336,17 @@ def run_exp_SDDMM(Exp1_directory,iters,path_to_reports_dir):
             app_speedup = app_time/opt_app_time
             f.write("->Speedup="+str(app_speedup)+"\n")
 
-            #Clean the object files
-            os.chdir(base_path)
-            Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
-
-            os.chdir(opt_code_path)
-            Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
-
-
             f.write("\n-------------------------------------------------------------------------------\n")
+
+        #Clean the object files
+        os.chdir(base_path)
+        Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
+
+        os.chdir(opt_code_path)
+        Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
+
+
+            
     
     return
 
@@ -370,8 +378,8 @@ def RunExp(root_directory):
 
     Exp1_directory = root_directory + '/Experiment_1/'
 
-    list_benchmarks = ['AMGmk','UA-NAS', 'SDDMM']
-    # list_benchmarks = ['SDDMM']
+    #list_benchmarks = ['AMGmk','UA-NAS', 'SDDMM']
+    list_benchmarks = ['SDDMM']
 
     for i in range(0,len(list_benchmarks)):
 
