@@ -7,12 +7,12 @@
 
 --------------------------------------------------------------------------
 Input Class: B
-->Baseline execution time =56.85 s (0.0 % variation)
-Execution time of code with Base Technique of [5] =21.0 s (0.0 % variation)
-->Base Technique Speedup=2.7071428571428573
+->Baseline execution time =39.6 s (0.0 % variation)
+Execution time of code with Base Technique of [5] =17.14 s (0.0 % variation)
+->Base Technique Speedup=2.310385064177363
 
-Execution time of code with the Technique of this paper =23.39 s (0.0 % variation)
-->New Technique Speedup=2.430525865754596
+Execution time of code with the Technique of this paper =16.24 s (0.0 % variation)
+->New Technique Speedup=2.4384236453201975
 
 
 -------------------------------------------------------------------------------

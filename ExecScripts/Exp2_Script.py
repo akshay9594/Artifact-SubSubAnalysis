@@ -9,6 +9,7 @@ import re,os,sys
 import utils
 
 
+speedup_dict = {}
 
 #Compile the SDDMM benchmark
 def compile_poly(base_path):
@@ -186,7 +187,7 @@ def run_poly_benchmark(Exp2_directory,benchmark,path_to_reports_dir):
 
     #If the user wants to run the experiment for all the input files
 
-    head_String = "\n===============Timing Results for the fdtd benchmark(Average of "+ 5 +" runs)===============\n\n"
+    head_String = "\n===============Timing Results for the fdtd benchmark(Average of "+ str(5) +" runs)===============\n\n"
 
     #Set the path of the baseline codes
     baseline_path = Exp2_directory + benchmark + '/Serial/'
@@ -258,7 +259,7 @@ def run_poly_benchmark(Exp2_directory,benchmark,path_to_reports_dir):
     os.chdir(New_Opt_code_path)
     Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
     
-    return
+    return (Base_Tech_speedup,New_Tech_speedup)
 
 
 #Running the NAS benchmarks
@@ -334,7 +335,7 @@ def run_NAS_benchmark(Exp2_directory,benchmark,iters,path_to_reports_dir,cl,exec
     Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
         
 
-    return
+    return Base_Tech_speedup,New_Tech_speedup
 
 
 
@@ -411,7 +412,7 @@ def run_Other_Benchmark(benchmark,Exp2_directory,iters,path_to_reports_dir,execu
     Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
 
     
-    return
+    return Base_Tech_speedup,New_Tech_speedup
 
 
 
@@ -498,7 +499,7 @@ def run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executabl
         Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
 
 
-    return
+    return Base_Tech_speedup,New_Tech_speedup
 
 
 
@@ -514,8 +515,10 @@ def drive_poly(Exp2_directory,root_directory,path_to_reports_dir,list_benchmarks
         print(str(i+1) + "." , "For Benchmark:", benchmark)
 
         #Actual subroutine that executes the benchmark
-        run_poly_benchmark(Exp2_directory,benchmark,path_to_reports_dir)
+        BaseTech_Speedup,NewTech_Speedup = run_poly_benchmark(Exp2_directory,benchmark,path_to_reports_dir)
 
+        speedup_dict[benchmark] = (BaseTech_Speedup,NewTech_Speedup)
+        
         os.chdir(root_directory)
 
     return
@@ -549,8 +552,13 @@ def drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_bench
             return
 
         #Actual subroutine that executes the benchmark
-        run_NAS_benchmark(Exp2_directory,benchmark,iters,path_to_reports_dir,input_class,executable)
+        Base_Tech_speedup,New_Tech_speedup = run_NAS_benchmark(Exp2_directory,benchmark,iters,path_to_reports_dir,input_class,executable)
 
+        if(benchmark == 'UA'):
+            speedup_dict[benchmark + '(transf)'] = (Base_Tech_speedup,New_Tech_speedup)
+        else:
+            speedup_dict[benchmark] = (Base_Tech_speedup,New_Tech_speedup)
+        
         os.chdir(root_directory)
 
     return
@@ -578,16 +586,20 @@ def drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_ben
         elif(benchmark == 'amgmk'):
             path_to_input = ''
             executable = 'AMGMk'
+        #CHOLMOD Suitesparse needs to be handled separately
         elif(benchmark == 'SuiteSparse'):
             executable = 'cholmod_demo'
             input_mat = 'spal_004'
             path_to_input = os.getcwd() + '/input_matrices/' + input_mat + '/' + input_mat + '.mtx'
-            run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executable,path_to_input)
+            Base_Tech_speedup,New_Tech_speedup = run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executable,path_to_input)
+            speedup_dict[benchmark] = (Base_Tech_speedup,New_Tech_speedup)
             os.chdir(root_directory)
             continue
         
 
-        run_Other_Benchmark(benchmark,Exp2_directory,iters,path_to_reports_dir,executable,path_to_input)
+        Base_Tech_speedup,New_Tech_speedup = run_Other_Benchmark(benchmark,Exp2_directory,iters,path_to_reports_dir,executable,path_to_input)
+
+        speedup_dict[benchmark] = (Base_Tech_speedup,New_Tech_speedup)
 
         os.chdir(root_directory)
 
@@ -615,15 +627,18 @@ def RunExp(root_directory):
 
     for tag in benchmark_tags:
         list_benchmarks = benchmarks_dict[tag]
-        # if(tag == 'poly'):
-        #     drive_poly(Exp2_directory,root_directory,path_to_reports_dir,list_benchmarks)
+        if(tag == 'poly'):
+            drive_poly(Exp2_directory,root_directory,path_to_reports_dir,list_benchmarks)
 
-        # if(tag == 'NAS'):
-        #     drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
+        if(tag == 'NAS'):
+            drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
 
         if(tag == 'Other'):
             drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
 
+    plot_title = "Performance comparsion of the technique of [5] and the New Technique"
+
+    utils.plot_data_Exp2(speedup_dict,plot_title,path_to_reports_dir,xlabel="benchmark",ylabel="performance improvement")
 
     print("\nExperiment finished and Results written to the Reports directory!!")
 

@@ -224,7 +224,7 @@ def run_exp_UA(Exp1_directory,iters,path_to_reports_dir):
 
     head_String = "\n===============Timing Results for the Kernel transf NAS-UA benchmark(Average of "+ str(iters)+" runs)===============\n\n"
 
-    input_classes = ['A', 'B']      # Include Class C
+    input_classes = ['A', 'B', 'C'] 
 
     speedup_dict = {}
 
@@ -396,8 +396,8 @@ def RunExp(root_directory):
 
     Exp1_directory = root_directory + '/Experiment_1/'
 
-    list_benchmarks = ['AMGmk','UA-NAS', 'SDDMM']
-    #list_benchmarks = ['SDDMM']
+    #list_benchmarks = ['AMGmk','UA-NAS', 'SDDMM']
+    list_benchmarks = ['UA-NAS']
 
     ylabel="Performance Improvement"
     for i in range(0,len(list_benchmarks)):
@@ -416,7 +416,7 @@ def RunExp(root_directory):
         os.chdir(root_directory)
 
         #Plot the speedup data
-        utils.plot_data(benchmark,speedup_dict,plot_title,xlabel,ylabel,path_to_reports_dir)
+        utils.plot_data_Exp1(benchmark,speedup_dict,plot_title,xlabel,ylabel,path_to_reports_dir)
 
     print("Experiment finished and Results written to the Reports directory!!")
 

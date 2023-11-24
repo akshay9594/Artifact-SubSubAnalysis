@@ -1,9 +1,10 @@
 
 import math,shutil,subprocess
 import matplotlib.pylab as plt
-import os
+import numpy as np
 
-def plot_data(benchmark_name,plot_data_dict, plot_title,xlabel,ylabel,save_direc):
+#Plotting routine for Experiment 1
+def plot_data_Exp1(benchmark_name,plot_data_dict, plot_title,xlabel,ylabel,save_direc):
     plot_data_list = plot_data_dict.items()
     #plot_data_list = sorted(plot_data_list) 
     x, y = zip(*plot_data_list) 
@@ -14,6 +15,32 @@ def plot_data(benchmark_name,plot_data_dict, plot_title,xlabel,ylabel,save_direc
     plt.ylabel(ylabel) 
 
     plt.savefig(save_direc + "/" + benchmark_name + '.png')
+
+#Plotting routine for Experiment 2
+def plot_data_Exp2(plot_data_dict:dict, plot_title,save_direc,xlabel,ylabel):
+
+    benchmarks_list = list(plot_data_dict.keys())
+    BaseTech_Speedups = []
+    NewTech_Speedups = []
+
+    for benchmark in benchmarks_list:
+        speedup_tuple = plot_data_dict[benchmark]
+        BaseTech_Speedups.append(speedup_tuple[0])
+        NewTech_Speedups.append(speedup_tuple[1])
+  
+    X_axis = np.arange(len(benchmarks_list)) 
+  
+    plt.figure().set_figwidth(12)
+    plt.bar(X_axis - 0.2, BaseTech_Speedups, 0.4, label = 'Cetus+BaseAlgo',width=0.08) 
+    plt.bar(X_axis + 0.2, NewTech_Speedups, 0.4, label = 'Cetus+NewAlgo',width=0.08) 
+  
+    plt.xticks(X_axis, benchmarks_list) 
+    plt.xlabel(xlabel) 
+    plt.ylabel(ylabel) 
+    plt.title(plot_title) 
+    plt.legend() 
+
+    plt.savefig(save_direc + "Exp2")
 
 #Calculates run-to-run variation (%)
 def calculate_variation(values_list, mean):

@@ -9,7 +9,7 @@ CC       = gcc
 
 CFLAGS   = -O3 -fopenmp 
 
-LDFLAGS  = -lm -mcmodel=large -fopenmp 
+LDFLAGS  = -lm -mcmodel=small -fopenmp 
 
 PROG     = mg.B.x
 

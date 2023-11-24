@@ -59,8 +59,8 @@ os.chdir(root)
 #Step 1: Select the benchmark to be evaluated
 # val = input("\t1. Experiment 1\n\t2. Experiment 2\n\t3. Both Experiments\n->Select the Experiment you want to run by entering the number:\n")
 
-print("\nRunning Experiment 1...\n")
-Exp1_Script.RunExp(root)
+print("\nRunning Experiment 2...\n")
+Exp2_Script.RunExp(root)
 
 # if(val == '1'):
 #     print("\nRunning Experiment 1...")

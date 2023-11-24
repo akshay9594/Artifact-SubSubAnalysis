@@ -9,7 +9,7 @@ CC       = gcc
 
 CFLAGS   = -O3 -fopenmp 
 
-LDFLAGS  = -lm -mcmodel=medium -fopenmp 
+LDFLAGS  = -lm -mcmodel=small -fopenmp 
 
 PROG     = ua.A.x
 
