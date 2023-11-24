@@ -76,7 +76,6 @@ int main(int argc, char * argv[])
 	printf("//  CORAL  AMGmk Benchmark Version 1.0 \n");
 	printf("// \n");
 	printf("//------------ \n");
-	omp_set_num_threads(4);
 	#pragma omp parallel 
 	 #pragma omp master 
 	max_num_threads=omp_get_num_threads();

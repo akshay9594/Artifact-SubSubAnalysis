@@ -76,9 +76,10 @@ int main(int argc, char * argv[])
 	printf("//  CORAL  AMGmk Benchmark Version 1.0 \n");
 	printf("// \n");
 	printf("//------------ \n");
-	#pragma omp parallel 
-	#pragma omp master 
-	max_num_threads=omp_get_num_threads();
+	omp_set_num_threads(1);
+    #pragma omp parallel
+     #pragma omp master
+        max_num_threads = omp_get_num_threads();
 	printf("\nmax_num_threads = %d \n\n", max_num_threads);
 	printf("\n testIter   = %d \n\n", testIter);
 	t0=omp_get_wtime();

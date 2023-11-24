@@ -155,6 +155,7 @@ int main(int argc, char *argv[]){
   double* ParallelP;
   int max_num_threads;
 
+    omp_set_num_threads(1);
     #pragma omp parallel
      #pragma omp master
         max_num_threads = omp_get_num_threads();

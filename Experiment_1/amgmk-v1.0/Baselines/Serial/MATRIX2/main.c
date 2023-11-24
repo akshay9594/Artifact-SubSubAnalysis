@@ -11,7 +11,7 @@
 //--------------
 #include <stdio.h>
 #include <stdlib.h>
-//#include <omp.h>
+#include <omp.h>
 #include <sys/time.h>
 #include "headers.h"
 
@@ -33,6 +33,10 @@ int main(int argc, char *argv[])
          del_wtime = 0.0;
 
   int  max_num_threads;
+  omp_set_num_threads(1);
+    #pragma omp parallel
+     #pragma omp master
+        max_num_threads = omp_get_num_threads();
 
   printf("\n");
   printf("//------------ \n");
@@ -60,7 +64,6 @@ int main(int argc, char *argv[])
 
   printf("\nWall time = %f seconds. \n", totalWallTime);
    printf("Target loop time=%f seconds\n", total_target_loop_time);
-  max_num_threads = 1;
   printf("max_num_threads =%d\n",max_num_threads);
   // // Relax
   // totalWallTime = 0.0;

@@ -262,9 +262,10 @@ int main(int argc, char * argv[])
 	int i_2;
 	int i_3;
 
-	 #pragma omp parallel 
-	 #pragma omp master 
-	max_num_threads=omp_get_num_threads();
+	omp_set_num_threads(1);
+    #pragma omp parallel
+     #pragma omp master
+        max_num_threads = omp_get_num_threads();
 	printf("\nmax_num_threads = %d\n ", max_num_threads);
 	/* --------------------------------------------------------------------- */
 	/* Read input file (if it exists), else take */

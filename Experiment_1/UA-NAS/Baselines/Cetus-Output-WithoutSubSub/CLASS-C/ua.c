@@ -255,9 +255,10 @@ int main(int argc, char * argv[])
 	double t2, trecs[(11+1)];
 	char * t_names[(11+1)];
 	int max_num_threads;
-	#pragma omp parallel 
-	#pragma omp master 
-	max_num_threads=omp_get_num_threads();
+	omp_set_num_threads(1);
+    #pragma omp parallel
+     #pragma omp master
+        max_num_threads = omp_get_num_threads();
 	printf("\nmax_num_threads = %d\n ", max_num_threads);
 
 	FILE * fp;

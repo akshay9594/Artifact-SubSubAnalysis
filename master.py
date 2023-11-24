@@ -2,24 +2,11 @@
 
 import os,sys
 
-import requests,subprocess
+import subprocess
 
 from ExecScripts import Exp1_Script,Exp2_Script
 
-
-def runcmd(cmd, verbose = False):
-
-    process = subprocess.Popen(
-        cmd,
-        stdout = subprocess.PIPE,
-        stderr = subprocess.PIPE,
-        text = True,
-        shell = True
-    )
-    std_out, std_err = process.communicate()
-    # if verbose:
-    #     print(std_out.strip(), std_err)
-    pass
+from utils import runcmd
 
 
 
@@ -30,7 +17,10 @@ print("\n***********************************************************************
 
 root = os.getcwd()
 
-input_matrices_direc = root + "/input_matrices"
+input_matrices_direc = root + "/input_matrices/"
+
+if(os.path.exists(input_matrices_direc) == False):
+    os.mkdir(input_matrices_direc)
 
 os.chdir(input_matrices_direc)
 
@@ -51,8 +41,9 @@ print("Downloading the required external input matrices from the SuiteSparse Mat
 for matrix in input_matrix_dict.keys():
     download_url = input_matrix_dict[matrix]
     matrix_tar = matrix + '.tar.gz'
-    print("\t",matrix)
-    if(os.path.exists(matrix) == False):
+   
+    if(os.path.exists(input_matrices_direc + matrix) == False):
+
         download_url = download_url + matrix_tar
 
         runcmd("wget "+download_url, verbose = True)

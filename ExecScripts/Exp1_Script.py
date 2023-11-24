@@ -3,7 +3,7 @@ import matplotlib.pylab as plt
 
 from subprocess import Popen,PIPE
 
-import re,math,os,sys
+import re,os,subprocess
 
 import utils
 
@@ -173,6 +173,7 @@ def run_exp_amgmk(Exp1_directory,iters,path_to_reports_dir):
 
         f.write("\n--------------------------------------------------------------------------\n")
 
+        speedup_dict = {}
         for i in range(1,6):
             input_matrix = 'MATRIX'+ str(i)
             #Set the path of the baseline codes
@@ -200,6 +201,8 @@ def run_exp_amgmk(Exp1_directory,iters,path_to_reports_dir):
             app_speedup = app_time/opt_app_time
             f.write("->Speedup="+str(app_speedup)+"\n")
 
+            speedup_dict[input_matrix] = app_speedup
+
             #Clean the object files
             os.chdir(base_path)
             Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
@@ -210,7 +213,7 @@ def run_exp_amgmk(Exp1_directory,iters,path_to_reports_dir):
 
             f.write("\n-------------------------------------------------------------------------------\n")
 
-    return
+    return speedup_dict
 
 
 
@@ -222,6 +225,8 @@ def run_exp_UA(Exp1_directory,iters,path_to_reports_dir):
     head_String = "\n===============Timing Results for the Kernel transf NAS-UA benchmark(Average of "+ str(iters)+" runs)===============\n\n"
 
     input_classes = ['A', 'B']      # Include Class C
+
+    speedup_dict = {}
 
     with open(path_to_reports_dir+'/NAS-UA.txt', 'w') as f:
         f.write(head_String)
@@ -264,6 +269,7 @@ def run_exp_UA(Exp1_directory,iters,path_to_reports_dir):
             app_speedup = app_time/opt_app_time
             f.write("->Speedup="+str(app_speedup)+"\n")
 
+            speedup_dict['CLASS-'+cl] = app_speedup
             #Clean the object files
             os.chdir(base_path)
             Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
@@ -274,7 +280,7 @@ def run_exp_UA(Exp1_directory,iters,path_to_reports_dir):
 
             f.write("\n-------------------------------------------------------------------------------\n")
 
-    return
+    return speedup_dict
 
 
 
@@ -305,8 +311,8 @@ def run_exp_SDDMM(Exp1_directory,iters,path_to_reports_dir):
     #List of input matrices
     input_matrices = ['gsm_106857', 'dielFilterV2clx','af_shell1','inline_1']
 
-    #input_matrices = ['af_shell1.mtx']  
-
+    # input_matrices = ['af_shell1'] 
+    speedup_dict = {} 
 
     with open(path_to_reports_dir+'/SDDMM.txt', 'w') as f:
         f.write(head_String)
@@ -324,17 +330,20 @@ def run_exp_SDDMM(Exp1_directory,iters,path_to_reports_dir):
 
             #Path to the input matrix
             input_path = input_directory + matrix + "/" + matrix + ".mtx"
-
-            app_time, app_time_var, threads = execute_SDDMM(base_path,input_path,iters)
-
-            f.write("->Baseline execution time ="+ str(app_time)+" s " + "(" + str(app_time_var)+" % variation)\n")
             
+            #Execute the Baseline code
+            app_time, app_time_var, threads = execute_SDDMM(base_path,input_path,iters)
+            #Write the execution times to the output file
+            f.write("->Baseline execution time ="+ str(app_time)+" s " + "(" + str(app_time_var)+" % variation)" +"\n")
+            #Execute the optimized code
             opt_app_time, opt_time_var, threads = execute_SDDMM(opt_code_path,input_path,iters)
-
-            f.write("->Optimized Code execution time ="+ str(opt_app_time)+" s " + "(" + str(opt_time_var)+" % variation)\n")
-
+            #Writ the execution time to the output file
+            f.write("->Optimized Code execution time ="+ str(opt_app_time)+" s " + "(" + str(opt_time_var)+" % variation)"+"\n")
+            #Calculate the speedup
             app_speedup = app_time/opt_app_time
             f.write("->Speedup="+str(app_speedup)+"\n")
+
+            speedup_dict[matrix] = app_speedup
 
             f.write("\n-------------------------------------------------------------------------------\n")
 
@@ -345,30 +354,39 @@ def run_exp_SDDMM(Exp1_directory,iters,path_to_reports_dir):
         os.chdir(opt_code_path)
         Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
 
-
-            
     
-    return
-
-
+    return speedup_dict
 
 
 
 #Call specific subroutines that execute the benchmarks
 def run_benchmark(benchmark,Exp1_directory,iters,path_to_reports_dir):
 
+    speedup_dict = {}
+    xlabel = ''
+    plot_title = ' '
     if(benchmark == 'AMGmk'):
-        run_exp_amgmk(Exp1_directory,iters,path_to_reports_dir)
+        speedup_dict = run_exp_amgmk(Exp1_directory,iters,path_to_reports_dir)
+        plot_title = "Performance improvement of the AMGMk benchmark"
+        xlabel = "Input Matrices"
+
     elif(benchmark == 'UA-NAS'):
-        run_exp_UA(Exp1_directory,iters,path_to_reports_dir)
+        
+        speedup_dict = run_exp_UA(Exp1_directory,iters,path_to_reports_dir)
+        plot_title = "Performance improvement of the UA benchmark"
+        xlabel = "Input Class"
+
     elif(benchmark == 'SDDMM'):
-        run_exp_SDDMM(Exp1_directory,iters,path_to_reports_dir)
+        speedup_dict = run_exp_SDDMM(Exp1_directory,iters,path_to_reports_dir)
+        xlabel = "Input Matrices"
+        plot_title = "Performance improvement of the SDDMM benchmark"
+        
 
     else:
         print("Benchmark not supported")
     
     
-    return
+    return speedup_dict,plot_title,xlabel
 
 
 #Run the main experiment
@@ -378,9 +396,10 @@ def RunExp(root_directory):
 
     Exp1_directory = root_directory + '/Experiment_1/'
 
-    #list_benchmarks = ['AMGmk','UA-NAS', 'SDDMM']
-    list_benchmarks = ['SDDMM']
+    list_benchmarks = ['AMGmk','UA-NAS', 'SDDMM']
+    #list_benchmarks = ['SDDMM']
 
+    ylabel="Performance Improvement"
     for i in range(0,len(list_benchmarks)):
 
         benchmark = list_benchmarks[i]
@@ -392,9 +411,12 @@ def RunExp(root_directory):
         if(os.path.exists(path_to_reports_dir) == False):
             os.mkdir(path_to_reports_dir)
 
-        run_benchmark(benchmark,Exp1_directory,iters,path_to_reports_dir)
+        speedup_dict,plot_title,xlabel = run_benchmark(benchmark,Exp1_directory,iters,path_to_reports_dir)
 
         os.chdir(root_directory)
+
+        #Plot the speedup data
+        utils.plot_data(benchmark,speedup_dict,plot_title,xlabel,ylabel,path_to_reports_dir)
 
     print("Experiment finished and Results written to the Reports directory!!")
 

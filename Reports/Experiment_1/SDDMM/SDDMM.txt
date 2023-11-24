@@ -6,26 +6,26 @@
 
 --------------------------------------------------------------------------
 1. For matrix: gsm_106857
-->Baseline execution time =1.323684 s (0.0 % variation)
-->Optimized Code execution time =0.514238 s (0.0 % variation)
-->Speedup=2.5740688163846315
+->Baseline execution time =1.810913 s (0.0 % variation)
+->Optimized Code execution time =0.667069 s (0.0 % variation)
+->Speedup=2.7147311597450936
 
 -------------------------------------------------------------------------------
 2. For matrix: dielFilterV2clx
-->Baseline execution time =1.095788 s (0.0 % variation)
-->Optimized Code execution time =0.438478 s (0.0 % variation)
-->Speedup=2.4990717892345797
+->Baseline execution time =1.761589 s (0.0 % variation)
+->Optimized Code execution time =0.658543 s (0.0 % variation)
+->Speedup=2.6749794622370904
 
 -------------------------------------------------------------------------------
 3. For matrix: af_shell1
-->Baseline execution time =0.687965 s (0.0 % variation)
-->Optimized Code execution time =0.1382 s (0.0 % variation)
-->Speedup=4.9780390738060785
+->Baseline execution time =1.143497 s (0.0 % variation)
+->Optimized Code execution time =0.199076 s (0.0 % variation)
+->Speedup=5.744022383411361
 
 -------------------------------------------------------------------------------
 4. For matrix: inline_1
-->Baseline execution time =1.514578 s (0.0 % variation)
-->Optimized Code execution time =0.494613 s (0.0 % variation)
-->Speedup=3.06214757800543
+->Baseline execution time =2.420241 s (0.0 % variation)
+->Optimized Code execution time =0.706619 s (0.0 % variation)
+->Speedup=3.425100372336436
 
 -------------------------------------------------------------------------------

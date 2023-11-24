@@ -247,7 +247,8 @@ int main(int argc, char *argv[])
   char *t_names[t_last+1];
 
   int max_num_threads;
-  #pragma omp parallel
+  omp_set_num_threads(1);
+    #pragma omp parallel
      #pragma omp master
         max_num_threads = omp_get_num_threads();
        printf("\nmax_num_threads = %d\n ",max_num_threads );
