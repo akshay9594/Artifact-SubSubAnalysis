@@ -1,15 +1,14 @@
 
 
-import matplotlib.pylab as plt
-
 from subprocess import Popen,PIPE
 
-import re,os,sys
+import re,os
 
 import utils
 
 
 speedup_dict = {}
+benchmark_count = 1
 
 #Compile the SDDMM benchmark
 def compile_poly(base_path):
@@ -507,16 +506,16 @@ def run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executabl
 #Driver code to execute the Polybench benchmarks
 def drive_poly(Exp2_directory,root_directory,path_to_reports_dir,list_benchmarks):
 
-    for i in range(0,len(list_benchmarks)):
-        
-        benchmark = list_benchmarks[i]
+    for benchmark in list_benchmarks:
 
-        print(str(i+1) + "." , "For Benchmark:", benchmark)
+        print(benchmark_count + "." , "For Benchmark:", benchmark)
 
         #Actual subroutine that executes the benchmark
         BaseTech_Speedup,NewTech_Speedup = run_poly_benchmark(Exp2_directory,benchmark,path_to_reports_dir)
 
         speedup_dict[benchmark] = (BaseTech_Speedup,NewTech_Speedup)
+
+        benchmark_count = benchmark_count + 1
         
         os.chdir(root_directory)
 
@@ -525,11 +524,9 @@ def drive_poly(Exp2_directory,root_directory,path_to_reports_dir,list_benchmarks
 #Driver code that executes the NAS benchmarks
 def drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks):
 
-    for i in range(0,len(list_benchmarks)):
-        
-        benchmark = list_benchmarks[i]
+    for benchmark in list_benchmarks:
 
-        print(str(i+1) + "." , "For Benchmark:", benchmark)
+        print(benchmark_count + "." , "For Benchmark:", benchmark)
 
     #Set the input class to be used and executable for each benchmark
         input_class = ''
@@ -557,6 +554,8 @@ def drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_bench
             speedup_dict[benchmark + '(transf)'] = (Base_Tech_speedup,New_Tech_speedup)
         else:
             speedup_dict[benchmark] = (Base_Tech_speedup,New_Tech_speedup)
+
+        benchmark_count = benchmark_count + 1
         
         os.chdir(root_directory)
 
@@ -566,11 +565,9 @@ def drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_bench
 #Driver code that executes the NAS benchmarks
 def drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks):
 
-    for i in range(0,len(list_benchmarks)):
-        
-        benchmark = list_benchmarks[i]
+    for benchmark in list_benchmarks:
 
-        print(str(i+1) + "." , "For Benchmark:", benchmark)
+        print(benchmark_count + "." , "For Benchmark:", benchmark)
 
         executable = ''
         input_mat = ''
@@ -591,7 +588,8 @@ def drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_ben
             input_mat = 'spal_004'
             path_to_input = os.getcwd() + '/input_matrices/' + input_mat + '/' + input_mat + '.mtx'
             Base_Tech_speedup,New_Tech_speedup = run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executable,path_to_input)
-            speedup_dict[benchmark] = (Base_Tech_speedup,New_Tech_speedup)
+            benchmark_name = 'CHOLMOD'
+            speedup_dict[benchmark_name] = (Base_Tech_speedup,New_Tech_speedup)
             os.chdir(root_directory)
             continue
         
@@ -599,6 +597,8 @@ def drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_ben
         Base_Tech_speedup,New_Tech_speedup = run_Other_Benchmark(benchmark,Exp2_directory,iters,path_to_reports_dir,executable,path_to_input)
 
         speedup_dict[benchmark] = (Base_Tech_speedup,New_Tech_speedup)
+
+        benchmark_count = benchmark_count + 1
 
         os.chdir(root_directory)
 
@@ -637,7 +637,7 @@ def RunExp(root_directory):
     
     #Plot the speedups. Graph saved in the Graphs/Exp-2 directory. 
 
-    plot_title = "Performance comparsion of the technique of [5] and the New Technique"
+    plot_title = "Performance comparsion of the technique of [5] (Base Algo) and the New Technique (New Algo)"
 
     path_to_graphs_dir = root_directory + '/Graphs/Exp-2/'
 

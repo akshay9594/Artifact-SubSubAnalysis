@@ -1,18 +1,18 @@
 
-===============Timing Results for the SDDMM benchmark(Average of 1 runs)===============
+===============Timing Results for the SDDMM benchmark(Average of 3 runs)===============
 
 (a) Baseline Code : Serial code
 (b) Optimized Code : Cetus Parallel code (with the base technique applied)
                    : Cetus Parallel code (with the new technique applied)
 
 --------------------------------------------------------------------------
-->Baseline execution time =1.069632 s (0.0 % variation)
+->Baseline execution time =1.0702443333333334 s (0.10922949481963652 % variation)
 
-Execution time of code with Base Technique of [5] =1.588572 s (0.0 % variation)
-->Base Technique Speedup=0.67332925419811
+Execution time of code with Base Technique of [5] =1.5990929999999999 s (0.39078758659969975 % variation)
+->Base Technique Speedup=0.669282107628095
 
-Execution time of code with the Technique of this paper =0.415064 s (0.0 % variation)
-->New Technique Speedup=2.5770290846712793
+Execution time of code with the Technique of this paper =0.4137043333333334 s (0.11174445068548461 % variation)
+->New Technique Speedup=2.5869787843653236
 
 
 -------------------------------------------------------------------------------

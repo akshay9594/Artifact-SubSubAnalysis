@@ -1,5 +1,5 @@
 
-===============Timing Results for the Kernel transf NAS-UA benchmark(Average of 1 runs)===============
+===============Timing Results for the Kernel transf NAS-UA benchmark(Average of 3 runs)===============
 
 (a) Baseline Code : Serial code
 (b) Optimized Code : Cetus Parallel code (with the base technique applied)
@@ -7,12 +7,12 @@
 
 --------------------------------------------------------------------------
 Input Class: A
-->Baseline execution time =1.634526 s (0.0 % variation)
-Execution time of code with Base Technique of [5] =3.623739 s (0.0 % variation)
-->Base Technique Speedup=0.4510606310222673
+->Baseline execution time =1.6198543333333333 s (1.2040827660434714 % variation)
+Execution time of code with Base Technique of [5] =3.6650333333333336 s (0.18131523206124162 % variation)
+->Base Technique Speedup=0.4419753344671717
 
-Execution time of code with the Technique of this paper =1.103092 s (0.0 % variation)
-->New Technique Speedup=1.4817676132181177
+Execution time of code with the Technique of this paper =1.0447953333333333 s (5.066517859044436 % variation)
+->New Technique Speedup=1.5504034921033976
 
 
 -------------------------------------------------------------------------------

@@ -1,31 +1,31 @@
 
-===============Timing Results for the SDDMM benchmark(Average of 1 runs)===============
+===============Timing Results for the SDDMM benchmark(Average of 3 runs)===============
 
 (a) Baseline Code : Serial code
 (b) Optimized Code : Cetus Parallel code (with technique applied)
 
 --------------------------------------------------------------------------
 1. For matrix: gsm_106857
-->Baseline execution time =1.346867 s (0.0 % variation)
-->Optimized Code execution time =0.542231 s (0.0 % variation)
-->Speedup=2.4839358133341696
+->Baseline execution time =1.2083683333333333 s (0.026097516232190515 % variation)
+->Optimized Code execution time =0.5192926666666667 s (3.4153933317015537 % variation)
+->Speedup=2.3269505057520545
 
 -------------------------------------------------------------------------------
 2. For matrix: dielFilterV2clx
-->Baseline execution time =1.132269 s (0.0 % variation)
-->Optimized Code execution time =0.432029 s (0.0 % variation)
-->Speedup=2.620817121072891
+->Baseline execution time =1.077381 s (0.5359244891104521 % variation)
+->Optimized Code execution time =0.41703633333333334 s (0.18132106713838345 % variation)
+->Speedup=2.58342238765767
 
 -------------------------------------------------------------------------------
 3. For matrix: af_shell1
-->Baseline execution time =0.677572 s (0.0 % variation)
-->Optimized Code execution time =0.152723 s (0.0 % variation)
-->Speedup=4.436607452708498
+->Baseline execution time =0.6737890000000001 s (0.16039888573304628 % variation)
+->Optimized Code execution time =0.13441599999999998 s (0.34618059654907896 % variation)
+->Speedup=5.01271426020712
 
 -------------------------------------------------------------------------------
 4. For matrix: inline_1
-->Baseline execution time =1.487901 s (0.0 % variation)
-->Optimized Code execution time =0.486821 s (0.0 % variation)
-->Speedup=3.0563615784857268
+->Baseline execution time =1.4379853333333334 s (0.11606200639744697 % variation)
+->Optimized Code execution time =0.49699266666666664 s (0.8440625287050337 % variation)
+->Speedup=2.8933733428662265
 
 -------------------------------------------------------------------------------

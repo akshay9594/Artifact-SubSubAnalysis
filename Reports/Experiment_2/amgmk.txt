@@ -1,18 +1,18 @@
 
-===============Timing Results for the amgmk benchmark(Average of 1 runs)===============
+===============Timing Results for the amgmk benchmark(Average of 3 runs)===============
 
 (a) Baseline Code : Serial code
 (b) Optimized Code : Cetus Parallel code (with the base technique applied)
                    : Cetus Parallel code (with the new technique applied)
 
 --------------------------------------------------------------------------
-->Baseline execution time =2.587476 s (0.0 % variation)
+->Baseline execution time =2.5836210000000004 s (0.22003438191145405 % variation)
 
-Execution time of code with Base Technique of [5] =158.401069 s (0.0 % variation)
-->Base Technique Speedup=0.016334965517183473
+Execution time of code with Base Technique of [5] =159.00787666666668 s (0.16654033657157932 % variation)
+->Base Technique Speedup=0.016248383754071054
 
-Execution time of code with the Technique of this paper =1.908245 s (0.0 % variation)
-->New Technique Speedup=1.3559453843715037
+Execution time of code with the Technique of this paper =1.8981163333333335 s (0.36430724703458556 % variation)
+->New Technique Speedup=1.361149975177145
 
 
 -------------------------------------------------------------------------------
