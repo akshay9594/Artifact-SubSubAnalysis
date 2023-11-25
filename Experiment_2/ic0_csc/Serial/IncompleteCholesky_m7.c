@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
 
    }
 
-   printf("Time taken by the Serial kernel= %f s\n", num_runs,total_time/num_runs);
+   printf("Time taken by the Serial kernel= %f s\n",total_time/num_runs);
 
 
     fclose(fp);

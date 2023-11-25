@@ -286,7 +286,7 @@ int main(int argc, char * argv[])
 		 double seconds = (end.tv_sec + (double)end.tv_usec/1000000) - (start.tv_sec + (double)start.tv_usec/1000000);  
 		 total_time+= seconds; 
 	}
-	printf("Time taken by the Cetus Parallel kernel= %f s\n", num_runs, total_time/num_runs);
+	printf("Time taken by the Cetus Parallel kernel= %f s\n", total_time/num_runs);
 	fclose(fp);
 	if (line)
 	{

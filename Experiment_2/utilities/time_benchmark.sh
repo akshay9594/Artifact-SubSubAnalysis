@@ -70,8 +70,7 @@ echo "[INFO] Maximal variance authorized on 3 average runs: $VARIANCE_ACCEPTED%.
 $1 > ____tempfile.data.polybench;
 $1 >> ____tempfile.data.polybench;
 $1 >> ____tempfile.data.polybench;
-$1 >> ____tempfile.data.polybench;
-$1 >> ____tempfile.data.polybench;
+
 
 compute_mean_exec_time "____tempfile.data.polybench" "$1";
 echo "[INFO] Normalized time: $PROCESSED_TIME";

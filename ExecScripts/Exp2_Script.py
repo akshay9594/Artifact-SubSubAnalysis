@@ -152,7 +152,6 @@ def execute_Other_Benchmark(executable_path,input_path,iters,executable):
     else:
         exec_command = [executable_path,input_path]
 
-
     for i in range(0,iters):
         exec_result = Popen(exec_command,stdout=PIPE,stderr=PIPE)
         output, err_val = exec_result.communicate()
@@ -627,11 +626,11 @@ def RunExp(root_directory):
 
     for tag in benchmark_tags:
         list_benchmarks = benchmarks_dict[tag]
-        if(tag == 'poly'):
-            drive_poly(Exp2_directory,root_directory,path_to_reports_dir,list_benchmarks)
+        # if(tag == 'poly'):
+        #     drive_poly(Exp2_directory,root_directory,path_to_reports_dir,list_benchmarks)
 
-        if(tag == 'NAS'):
-            drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
+        # if(tag == 'NAS'):
+        #     drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
 
         if(tag == 'Other'):
             drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
