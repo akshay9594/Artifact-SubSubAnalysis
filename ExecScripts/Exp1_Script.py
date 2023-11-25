@@ -3,7 +3,7 @@ import matplotlib.pylab as plt
 
 from subprocess import Popen,PIPE
 
-import re,os,subprocess
+import re,os,sys
 
 import utils
 
@@ -384,7 +384,8 @@ def run_benchmark(benchmark,Exp1_directory,iters,path_to_reports_dir):
 
     else:
         print("Benchmark not supported")
-    
+        sys.exit()
+
     
     return speedup_dict,plot_title,xlabel
 
@@ -392,14 +393,18 @@ def run_benchmark(benchmark,Exp1_directory,iters,path_to_reports_dir):
 #Run the main experiment
 def RunExp(root_directory):
 
-    iters =  1
+    iters =  3
 
     Exp1_directory = root_directory + '/Experiment_1/'
 
-    #list_benchmarks = ['AMGmk','UA-NAS', 'SDDMM']
-    list_benchmarks = ['UA-NAS']
+    list_benchmarks = ['AMGmk','UA-NAS', 'SDDMM']
 
+
+    #Some plot parameters
+    path_o_graphs_dir = root_directory + '/Graphs/Exp-1/'
+    plot_colors = ['Red','Blue','Green']
     ylabel="Performance Improvement"
+
     for i in range(0,len(list_benchmarks)):
 
         benchmark = list_benchmarks[i]
@@ -415,10 +420,8 @@ def RunExp(root_directory):
 
         os.chdir(root_directory)
 
-        #Plot the speedup data
-        utils.plot_data_Exp1(benchmark,speedup_dict,plot_title,xlabel,ylabel,path_to_reports_dir)
-
-    print("Experiment finished and Results written to the Reports directory!!")
+        #Plot the speedup data. Graph saved in the Graphs/Exp-1 directory with the benchmark name.
+        utils.plot_data_Exp1(benchmark,speedup_dict,plot_title,xlabel,ylabel,path_o_graphs_dir,plot_colors[i])
 
 
 

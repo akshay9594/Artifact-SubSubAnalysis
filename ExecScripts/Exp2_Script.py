@@ -607,7 +607,7 @@ def drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_ben
 #Run the main experiment
 def RunExp(root_directory):
 
-    iters =  1
+    iters =  3
 
     Exp2_directory = root_directory + '/Experiment_2/'
 
@@ -621,26 +621,26 @@ def RunExp(root_directory):
     benchmarks_dict = {'poly':['fdtd-2d','heat-3d', 'gramschmidt', 'syrk'],
                         'NAS':['CG', 'MG', 'UA', 'IS'], 'Other':['SDDMM','ic0_csc','amgmk','SuiteSparse']}
   
-    #'Other':['SDDMM','ic0_csc','amgmk','SuiteSparse']
     benchmark_tags = list(benchmarks_dict.keys())
 
     for tag in benchmark_tags:
         list_benchmarks = benchmarks_dict[tag]
-        # if(tag == 'poly'):
-        #     drive_poly(Exp2_directory,root_directory,path_to_reports_dir,list_benchmarks)
+        if(tag == 'poly'):
+            drive_poly(Exp2_directory,root_directory,path_to_reports_dir,list_benchmarks)
 
-        # if(tag == 'NAS'):
-        #     drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
+        if(tag == 'NAS'):
+            drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
 
         if(tag == 'Other'):
             drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
 
+    
+    #Plot the speedups. Graph saved in the Graphs/Exp-2 directory. 
+
     plot_title = "Performance comparsion of the technique of [5] and the New Technique"
 
-    utils.plot_data_Exp2(speedup_dict,plot_title,path_to_reports_dir,xlabel="benchmark",ylabel="performance improvement")
+    path_to_graphs_dir = root_directory + '/Graphs/Exp-2/'
 
-    print("\nExperiment finished and Results written to the Reports directory!!")
-
-
+    utils.plot_data_Exp2(speedup_dict,plot_title,path_to_graphs_dir,xlabel="benchmark",ylabel="performance improvement")
 
     return

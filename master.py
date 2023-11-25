@@ -10,6 +10,9 @@ from utils import runcmd
 
 
 
+
+
+
 print("\n*************************************************************************\n")
 print("\t\t>Artifact execution for reproducing the results<")
 print("\n*************************************************************************\n")
@@ -36,7 +39,7 @@ input_matrix_dict = {'gsm_106857':'https://suitesparse-collection-website.heroku
 # #Tar files of the matrices are download. The matrix is extracted and
 # # then the tar file is deleted.
 
-print("Downloading the required external input matrices from the SuiteSparse Matrix Collection...")
+print("(a)  Step 1:  Downloading and installing the required inputs and dependencies...")
 
 for matrix in input_matrix_dict.keys():
     download_url = input_matrix_dict[matrix]
@@ -52,27 +55,36 @@ for matrix in input_matrix_dict.keys():
 
         runcmd("rm -d "+matrix_tar, verbose = True)
     
-print("\nMatrices downloaded and placed within the input_matrices directory!!")
+print("\n\t-->Downloads Complete!!")
 os.chdir(root)
 
+print("\n--------------------------------------------------------------------------\n")
+
+print("(b)  Step 2:  Experiment selection and execution\n")
+
 #Main code
-#Step 1: Select the benchmark to be evaluated
-# val = input("\t1. Experiment 1\n\t2. Experiment 2\n\t3. Both Experiments\n->Select the Experiment you want to run by entering the number:\n")
+# Step 2: Select the Experiment to be executed
+val = input("\t1. Experiment 1 (Measures performance improvement for 3 benchmarks)\n\t" +
+            "2. Experiment 2 (Compares the performance impact of the Base technique and New technique)\n\t" +
+            "3. Both Experiments\n\n\t-->Select the Experiment you want to run by entering the number: ")
 
-print("\nRunning Experiment 2...\n")
-Exp2_Script.RunExp(root)
+# Run the experiment
+if(val == '1'):
+    print("\n\nRunning Experiment 1...")
+    Exp1_Script.RunExp(root)
+    print("\nExperiment finished! Results written to the Reports directory and Graphs to the Graphs directory!!")
 
-# if(val == '1'):
-#     print("\nRunning Experiment 1...")
-#     print("==>This experiment measures performance improvement for 3 benchmarks")
-#     Exp1_Script.RunExp(root)
+elif(val == '2'):
+    print("\n\nRunning Experiment 2...")
+    Exp2_Script.RunExp(root)
+    print("\nExperiment finished! Results written to the Reports directory and Graphs to the Graphs directory!!")
 
-# elif(val == '2'):
-#     print("\nRunning Experiment 2...")
-#     Exp2_Script.RunExp(root)
+elif(val == '3'):
+    print("\n\nRunning both Experiments...")
+    print("\nExperiment(s) finished! Results written to the Reports directory and Graphs to the Graphs directory!!")
 
-# elif(val == '3'):
-#     print("\nRunning both Experiments...")
+else:
+    print("\nInvalid Selection")
 
-# else:
-#     print("Invalid Selection")
+
+print("\n*************************************************************************\n")

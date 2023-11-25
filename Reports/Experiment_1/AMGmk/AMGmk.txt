@@ -6,32 +6,32 @@
 
 --------------------------------------------------------------------------
 1. Input Matrix: MATRIX1
-->Baseline execution time=1.296641 s (0.0 % variation)
-->Optimized Code execution time =0.85582 s (0.0 % variation)
-->Speedup=1.515086116239396
+->Baseline execution time=1.574597 s (0.0 % variation)
+->Optimized Code execution time =1.056092 s (0.0 % variation)
+->Speedup=1.4909657491960928
 
 -------------------------------------------------------------------------------
 2. Input Matrix: MATRIX2
-->Baseline execution time=2.534054 s (0.0 % variation)
-->Optimized Code execution time =1.687412 s (0.0 % variation)
-->Speedup=1.5017399425866356
+->Baseline execution time=3.045817 s (0.0 % variation)
+->Optimized Code execution time =2.187608 s (0.0 % variation)
+->Speedup=1.3923047456399866
 
 -------------------------------------------------------------------------------
 3. Input Matrix: MATRIX3
-->Baseline execution time=6.0344 s (0.0 % variation)
-->Optimized Code execution time =4.107494 s (0.0 % variation)
-->Speedup=1.4691196140517795
+->Baseline execution time=7.313178 s (0.0 % variation)
+->Optimized Code execution time =6.535082 s (0.0 % variation)
+->Speedup=1.1190644585637946
 
 -------------------------------------------------------------------------------
 4. Input Matrix: MATRIX4
-->Baseline execution time=10.496782 s (0.0 % variation)
-->Optimized Code execution time =7.08072 s (0.0 % variation)
-->Speedup=1.482445570506954
+->Baseline execution time=13.944761 s (0.0 % variation)
+->Optimized Code execution time =11.254047 s (0.0 % variation)
+->Speedup=1.2390885696496559
 
 -------------------------------------------------------------------------------
 5. Input Matrix: MATRIX5
-->Baseline execution time=20.481794 s (0.0 % variation)
-->Optimized Code execution time =13.960326 s (0.0 % variation)
-->Speedup=1.4671429592690028
+->Baseline execution time=27.863189 s (0.0 % variation)
+->Optimized Code execution time =19.540063 s (0.0 % variation)
+->Speedup=1.4259518508205422
 
 -------------------------------------------------------------------------------

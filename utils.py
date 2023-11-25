@@ -4,17 +4,20 @@ import matplotlib.pylab as plt
 import numpy as np
 
 #Plotting routine for Experiment 1
-def plot_data_Exp1(benchmark_name,plot_data_dict, plot_title,xlabel,ylabel,save_direc):
+def plot_data_Exp1(benchmark_name,plot_data_dict, plot_title,xlabel,ylabel,save_direc,plt_color):
+  
     plot_data_list = plot_data_dict.items()
+   
     #plot_data_list = sorted(plot_data_list) 
     x, y = zip(*plot_data_list) 
 
-    plt.plot(x, y)
+    plt.plot(x, y,color=plt_color)
     plt.title(plot_title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel) 
 
     plt.savefig(save_direc + "/" + benchmark_name + '.png')
+    plt.close()
 
 #Plotting routine for Experiment 2
 def plot_data_Exp2(plot_data_dict:dict, plot_title,save_direc,xlabel,ylabel):
@@ -30,9 +33,9 @@ def plot_data_Exp2(plot_data_dict:dict, plot_title,save_direc,xlabel,ylabel):
   
     X_axis = np.arange(len(benchmarks_list)) 
   
-    plt.figure().set_figwidth(12)
-    plt.bar(X_axis - 0.2, BaseTech_Speedups, 0.4, label = 'Cetus+BaseAlgo',width=0.08) 
-    plt.bar(X_axis + 0.2, NewTech_Speedups, 0.4, label = 'Cetus+NewAlgo',width=0.08) 
+    plt.figure().set_figwidth(16)
+    plt.bar(X_axis - 0.2, BaseTech_Speedups, 0.4, label = 'Cetus+BaseAlgo') 
+    plt.bar(X_axis + 0.2, NewTech_Speedups, 0.4, label = 'Cetus+NewAlgo') 
   
     plt.xticks(X_axis, benchmarks_list) 
     plt.xlabel(xlabel) 
