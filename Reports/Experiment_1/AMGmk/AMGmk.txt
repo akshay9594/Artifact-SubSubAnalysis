@@ -6,32 +6,32 @@
 
 --------------------------------------------------------------------------
 1. Input Matrix: MATRIX1
-->Baseline execution time=1.5149800000000002 s (0.1828151347637526 % variation)
-->Optimized Code execution time =1.0692353333333333 s (0.8708880579991056 % variation)
-->Speedup=1.416881721703922
+->Baseline execution time=1.5521026666666664 s (1.7973702252571488 % variation)
+->Optimized Code execution time =1.0821003333333332 s (2.7569585276644184 % variation)
+->Speedup=1.4343426564573032
 
 -------------------------------------------------------------------------------
 2. Input Matrix: MATRIX2
-->Baseline execution time=2.933532666666667 s (0.14549624008669948 % variation)
-->Optimized Code execution time =2.077131666666667 s (1.391229787764393 % variation)
-->Speedup=1.4122998140865728
+->Baseline execution time=3.1058079999999997 s (0.6858051441634117 % variation)
+->Optimized Code execution time =2.2691673333333333 s (12.945483666865385 % variation)
+->Speedup=1.3686994142638518
 
 -------------------------------------------------------------------------------
 3. Input Matrix: MATRIX3
-->Baseline execution time=6.921216666666666 s (0.4673130625340777 % variation)
-->Optimized Code execution time =4.963871 s (0.43116490383924805 % variation)
-->Speedup=1.3943183992224346
+->Baseline execution time=7.206949666666667 s (2.513585925886401 % variation)
+->Optimized Code execution time =5.028741666666666 s (0.99108315053121 % variation)
+->Speedup=1.433151699646532
 
 -------------------------------------------------------------------------------
 4. Input Matrix: MATRIX4
-->Baseline execution time=12.046281333333333 s (1.5847344910793846 % variation)
-->Optimized Code execution time =10.027755666666666 s (0.3749803887947641 % variation)
-->Speedup=1.2012938621327265
+->Baseline execution time=12.199971 s (2.3716175219246205 % variation)
+->Optimized Code execution time =10.448912 s (0.7283816841395881 % variation)
+->Speedup=1.167582902411275
 
 -------------------------------------------------------------------------------
 5. Input Matrix: MATRIX5
-->Baseline execution time=23.26565533333333 s (0.06767088921296113 % variation)
-->Optimized Code execution time =17.776837333333333 s (0.0953285179721301 % variation)
-->Speedup=1.3087623460281048
+->Baseline execution time=25.631423666666667 s (0.07126083770068978 % variation)
+->Optimized Code execution time =18.306741666666667 s (1.0132353702759318 % variation)
+->Speedup=1.4001084482082875
 
 -------------------------------------------------------------------------------

@@ -6,20 +6,20 @@
 
 --------------------------------------------------------------------------
 1. Input Class: A
-->Baseline execution time =1.6201853333333336 s (1.2910222097268897 % variation)
-->Optimized Code execution time =0.8587226666666666 s (19.69025076211293 % variation)
-->Speedup=1.886738753062689
+->Baseline execution time =1.6529983333333333 s (1.1788281602514985 % variation)
+->Optimized Code execution time =0.6173256666666666 s (8.143249529424459 % variation)
+->Speedup=2.677676342632765
 
 -------------------------------------------------------------------------------
 2. Input Class: B
-->Baseline execution time =6.697301666666667 s (0.6276368582368803 % variation)
-->Optimized Code execution time =3.065777 s (2.8953442538921257 % variation)
-->Speedup=2.1845364704173416
+->Baseline execution time =7.020205999999999 s (1.0991061010616947 % variation)
+->Optimized Code execution time =2.913736 s (0.3726480098585894 % variation)
+->Speedup=2.409348684987246
 
 -------------------------------------------------------------------------------
 3. Input Class: C
-->Baseline execution time =33.083487 s (0.9935942798245153 % variation)
-->Optimized Code execution time =16.87735866666667 s (0.7839412096624492 % variation)
-->Speedup=1.960228946567389
+->Baseline execution time =34.375698666666665 s (1.3603438440455267 % variation)
+->Optimized Code execution time =17.126374333333334 s (3.5923930373747277 % variation)
+->Speedup=2.007178985908342
 
 -------------------------------------------------------------------------------

@@ -1,24 +1,34 @@
 # Artifact Description for the Evaluation of Subscripted Subscript Analysis
 
-We have developed a new analysis technique for the automatic parallelization of subsripted
-subscript loops. The technique analyzes loops that define and/or modify the subscript array
-and determines array properties, which is sufficient to parallelize a class of subscripted
-subscripts. This repository mentions benchmark source codes used to evaluate two capabilites
-of the technique - (a) determining monotonicity of arrays that store intermittent sequences
-and (b) determining monotonicity of multi-dimensional subscript arrays. The technique has
-been described in detail in our paper - "Recurrence Analysis for Automatic Parallelization
-of Subscripted Subscripts" submitted to the Supercomputing 2023 conference. We present the
-experimental setup and steps involved to reproduce the results mentioned in the paper.
+This README describes how to evaluate the artifact for the paper: 
+"Recurrence Analysis for Automatic Parallelization of Subscripted Subscripts" submitted to
+the ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP) 2024.
 
-## Execution environment
-The results described in the above submitted paper have been gathered using the following 
-execution environment- a compute node with a 20-core Intel Xeon Gold 6230 processors in 
-a dual socket configuration, with a processor base frequency of 2.1 GHz, 27.5MB cache and we 
-used upto 8GB of DDR4 memory. The application codes were compiled using GCC v4.8.5 with the 
--O3 optimization flag enabled on CentOS v7.4.1708 and we report the mean of 5 application runs. 
-We observed an average run-to-run variation of 1.45% and we used one thread per core.
 
-## Dependencies
+## What is reproduced?
+The Artifact reproduces major parts of the evaluation results of Experiment 1 and 
+Experiment 2 mentioned in the paper. More specifically, the following results are
+reproduced:
+
+### For Experiment 1
+The speedup graphs for benchmarks AMGmk, SDDMM and UA(transf) shown in Figure 14. The scripts
+produce one graph for each benchmark. The graphs plot the performance improvement of the
+Cetus parallel codes (OpenMP parallelization) v/s the Serial baseline.
+
+Note: The scripts measure and plot the performance improvement for the maximum number of cores 
+available on the machine. The scripts cannot vary the number of cores available cores.
+
+### For Experiment 2
+
+The speedup graph shown in Figure 17 of the paper. The graph compares the impact of two techniques -
+*Cetus+BaseAlgo* and *Cetus+NewAlgo* on the performance of 12 benchmarks listed in Table 1 of the
+paper. The table also shows the inputs used for each benchmark. We used MATRIX2, dielFilterV2clx and 
+CLASS A as input datasets for the AMGmk, SDDMM and UA applications in this experiment.
+
+Note: The scripts measure and plot the performance improvement for the maximum number of cores 
+available on the machine.
+
+## Prerequisities
 ### Software
  - Linux (OS tested with : CentOS v7.4, Ubuntu v21.04)
  - GNU C Compiler (GCC) v4.8.5 and above
@@ -33,25 +43,27 @@ We observed an average run-to-run variation of 1.45% and we used one thread per 
 3. re
 4. math
 5. os
+6. Numpy
 
 ### Hardware
- - Machine with Intel processors (Sky Lake and beyond)
+ - Machine with x86-64 processors (Sky Lake and beyond)
 
 ## Obtaining the Codes
-The codes can be obtained from Zenodo from the above mentioned DOI. (or)
+The codes can be obtained from the Zenodo repository using the DOI.
 
-The codes can be obtained by cloning the git repository using the commands-
-```
-cd $HOME or cd ~
-git clone (https://github.com/akshay9594/Artifact-Supercomputing-2023.git)
-cd Artifact-Supercomputing-2023
-```
-This repository contains the benchmark codes listed below:
-
-| Code  | Source | Original Source link | 
-| ------------- | ------------- | ------------- |
-| Amgmk-v1.0  | CORAL Benchmark Codes | (https://asc.llnl.gov/coral-benchmarks)
-| UA-NAS | NAS Parallel Benchmarks | (https://github.com/akshay9594/SNU_NPB-1.0.3)
+## Code Description
+- The source code files for each experiment are placed in the directories -- *Experiment 1*
+    and *Experiment 2*.
+- For each benchmark, the Baseline and optimized (Technique(s)_Applied) source files  
+  are arranged.
+- The optimized files refer to the Cetus translated versions of the original source code.
+- For *Experiment 1*, the source files are further arranged according to the inputs to a 
+  benchmark if, the benchmark uses internally generated (within the code) inputs. 
+  E.g. for amgmk, the source files are arranged into directories *MATRIX1* through *MATRIX5* 
+  as these matrices are internally generated. 
+- For *Experiment 2*, the optimized source files are further arranged into the directories
+  *Base_Technique* (referring to the Base algorithm of [5]) and *New_Technique* 
+  (referring to the New algorithm presented in the paper).
 
 
 ### Installing the Non built-in python packages
@@ -62,97 +74,42 @@ Using the command:
 pip3 install -r requirements.txt
 ```
 
-## Directory Tree and Code Descriptions
-The directory layout of this Artifact is as follows-
-
-```bash
-├── Artifact-Supercomputing-2023
-│   ├── amgmk-v1.0
-│   │   ├── Baselines
-│   │   │   ├── Cetus-Output-WithoutSubSub
-│   │   │   ├── Serial
-│   │   └── Technique_Applied
-│   ├── UA-NAS
-│   │   ├── Baselines
-│   │   │   ├── Cetus-Output-WithoutSubSub
-│   │   │   ├── Serial
-│   │   └── Technique_Applied
-└── README.md
-└── requirements.txt
-└── run-exp.py
-```
-### Baseline and Optimized Codes
-- The experiments have two Baselines against which performance improvement is measured:
- 1. Serial Code
- 2. Cetus Parallelized code (without subscripted subscript analysis enabled)
-
-- The optimized codes are the Cetus parallelized codes (With technique enabled)
-
-***The serial baseline codes have been placed in the "Serial" directory
-and the Cetus parallelized codes (without subscripted subscript analysis applied) have 
-been placed in the "Cetus-Output-WithoutSubSub" directory for each benchmark.***
-
-***The Cetus parallelized codes with subscripted subscript analysis applied (Optimized 
-codes) have been placed in the "Technique_Applied" directory for each benchmark.***
-
 ## Compiling and Running the Codes
+
+Expected Completion time: ~1 hour for each experiment depending on the machine
 
 ### The master script:
 
-- The master script to perform the evaluation is the python script : run-exp.py
-- The master script is an interactive script and uses user input to:
-  1. Determine the benchmark to evaluate.
-  2. Set the baseline for the experiment (Serial or Cetus parallelized code 
-     without technique enabled).
-  3. Determine if the experiment should be run using one or all of the input 
-     matrices/classes.
-  4. Determine the number of runs (of the baseline code and the optimized application code) 
-     to determine the average execution time.
-  5. If the user chooses to run the experiment for all of the available inputs, 
-     the master script generates a graph showing the performance improvements, 
-     similar to the graphs presented in the Evaluation section.
+- The master script to perform the evaluation is the python script : master.py in the
+  root directory.
+- The master script is an interactive script and uses user input to determine which 
+  experiment to run -- *Experiment 1*, *Experiment 2* or both.
+- The script automatically download external inputs required for some benchmarks.
+- Run the master script using the following command:
 
-Notes: 
-1.    The master script does not vary the number of cores for the experiment as shown in the
-      results section of the Supercomputing paper. It uses the maximum available cores. The
-      user will have to first set the number of cores to use before running the master
-      script.
+    ```
+    python3 master.py
+    ```
 
 
 ### Generated Results:
 
-- The master script generates the following results:
-    - For the amgmk benchmark:
-        1. The Average baseline 'application' execution time
-        2. Average 'application' execution time of Cetus Parallelized Code (with technique applied)
-        3. Average baseline 'kernel' execution time
-        4. Average 'kernel' execution time of Cetus Parallelized Code (with technique applied)
-        5. The standard deviation for each of the above mentioned timing results
-        6. The performance improvement (Time taken by optimized code/Time taken by the baseline)
-        7. Displays the number of threads used
+- The master script generates the following:
 
-    - For the UA benchmark:
-        1. Average baseline execution time of the _transf_() routine
-        2. Average execution time of Cetus Parallelized _transf_() routine (with technique applied)
-        3. The standard deviation for each of the above mentioned timing results
-        4. The performance improvement (Time taken by optimized code/Time taken by the baseline)
-        5. Displays the number of threads used
+1. Execution time and Speedup Reports for each benchmark and each experiment
+   - The reports are placed in the *Reports* directory for each experiment.
+   - The reports show the execution times of the baseline and optimized codes
+     and the speedups.
+
+2. Graphs for each Experiment
+   - The generated graphs for each experiment are placed in the *Graphs* directory.
+   - For Experiments 1 and 2, the graphs are placed in the *Exp-1* and *Exp-2* 
+     subdirectories respectively.
 
 
 ## Translating an input code through the Cetus executable (Optional):
 
-A Cetus executable has been provided which can be used to perform sanity checks ensuring that
-Cetus with subscripted subscript analysis enabled generates the expected output code. Note that
-only Serial Baseline source codes can be translated.
-
-To perform the sanity check follow the steps below:
-
-```
-1. A cetus executable has been provided in the bin subdirectory of
-  'Cetus-Subscripted-Subscript_impl' parent directory.
-2. Navigate to the source code of the Serial Baseline to be translated:
-3. Run the script run-cetus.py:
-    $python3 run-cetus.py
-4. A new directory 'cetus_output' is created within the same folder as run-cetus.py
-    and the translated files are placed inside this new directory.
-```
+- A Cetus executable has been provided which can be used to perform sanity checks, ensuring that
+  Cetus with subscripted subscript analysis enabled, generates the expected optimized code.
+- The Cetus executable can be found in the directory *Cetus-bin*.
+- Note that only Serial Baseline source codes can be translated.

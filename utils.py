@@ -34,6 +34,7 @@ def plot_data_Exp2(plot_data_dict:dict, plot_title,save_direc,xlabel,ylabel):
     X_axis = np.arange(len(benchmarks_list)) 
   
     plt.figure().set_figwidth(18)
+    plt.figure().set_figheight(7)
     plt.bar(X_axis - 0.2, BaseTech_Speedups, 0.4, label = 'Cetus+BaseAlgo') 
     plt.bar(X_axis + 0.2, NewTech_Speedups, 0.4, label = 'Cetus+NewAlgo') 
   

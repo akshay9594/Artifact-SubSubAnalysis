@@ -78,8 +78,14 @@ elif(val == '2'):
     print("\nExperiment finished! Results written to the Reports directory and Graphs to the Graphs directory!!")
 
 elif(val == '3'):
-    print("\n\nRunning both Experiments...")
-    print("\nExperiment(s) finished! Results written to the Reports directory and Graphs to the Graphs directory!!")
+    print("\n\nRunning Experiment 1...")
+    Exp1_Script.RunExp(root)
+
+    print("\n--------------------------------------------------------------------------\n")
+
+    print("\n\nRunning Experiment 2...")
+    Exp2_Script.RunExp(root)
+    print("\nExperiment finished! Results written to the Reports directory and Graphs to the Graphs directory!!")
 
 else:
     print("\nInvalid Selection")

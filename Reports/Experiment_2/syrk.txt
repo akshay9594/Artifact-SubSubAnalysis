@@ -6,12 +6,12 @@
                    : Cetus Parallel code (with the new technique applied)
 
 --------------------------------------------------------------------------
-->Baseline execution time=22.77783566 s (1.198 % variation)
-Execution time of code with Base Technique of [5] =8.430711 s (7.353 % variation)
-->Base Technique Speedup=2.7017692410521486
+->Baseline execution time=23.07967233 s (1.501 % variation)
+Execution time of code with Base Technique of [5] =8.886585 s (11.816 % variation)
+->Base Technique Speedup=2.5971362823851907
 
-Execution time of code with the Technique of this paper =8.026545 s (8.334 % variation)
-->New Technique Speedup=2.8378132384481742
+Execution time of code with the Technique of this paper =8.84396866 s (8.091 % variation)
+->New Technique Speedup=2.609651076036265
 
 
 -------------------------------------------------------------------------------
