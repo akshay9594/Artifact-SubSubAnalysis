@@ -495,6 +495,9 @@ def run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executabl
         os.chdir(SuiteSparse_path+package)
         Popen(['make','clean'],stdout=PIPE,stderr=PIPE)
 
+    #Purge the executables from the Demo directory
+    os.chdir(base_path+"Demo/")
+    Popen(['make','purge'],stdout=PIPE,stderr=PIPE)
 
     return Base_Tech_speedup,New_Tech_speedup
 
@@ -617,6 +620,7 @@ def RunExp(root_directory):
     benchmarks_dict = {'poly':['fdtd-2d','heat-3d', 'gramschmidt', 'syrk'],
                         'NAS':['CG', 'MG', 'UA', 'IS'], 'Other':['SDDMM','ic0_csc','amgmk','SuiteSparse']}
   
+
     benchmark_tags = list(benchmarks_dict.keys())
 
     for tag in benchmark_tags:
