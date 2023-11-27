@@ -268,8 +268,6 @@ int CHOLMOD(super_numeric)
 
     }
 
-    printf("\n********************************************************\n");
-    printf("Threads : %d\n", CHOLMOD_OMP_NUM_THREADS);
 
     double one [2], zero [2], tstart,sum=0.0, sum1 = 0.0, sum2 = 0.0, sum3=0.0, thread_time[CHOLMOD_OMP_NUM_THREADS]={0.0}, starttime, endtime, threadtime;
     double *Lx, *Ax, *Fx, *Az, *Fz, *Cw;

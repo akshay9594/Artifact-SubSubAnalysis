@@ -228,7 +228,7 @@ def run_poly_benchmark(Exp2_directory,benchmark,path_to_reports_dir):
 
         app_time,app_time_var = execute_poly(exec_script,serial_executable)
 
-        f.write("->Baseline execution time="+ str(app_time)+" s " + "(" + str(app_time_var)+" % variation)\n")
+        f.write("->Baseline execution time="+ str(app_time)+" s " + "(" + str(app_time_var)+" % variation)\n\n")
 
         baseOptCode_time, baseOptCode_var = execute_poly(exec_script,Base_Opt_executable)
 
@@ -424,7 +424,7 @@ def run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executabl
     # Compile dependendent packages 
     SuiteSparse_path = Exp2_directory + benchmark
 
-    dependent_packages = ['/AMD/','/CAMD/','/COLAMD/','/SuiteSparse_config/']
+    dependent_packages = ['/SuiteSparse_config/','/AMD/','/CAMD/','/COLAMD/']
 
     for package in dependent_packages:
         compile_Other_Benchmark(SuiteSparse_path + package)
