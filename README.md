@@ -1,5 +1,7 @@
 # Artifact Description for the Evaluation of Subscripted Subscript Analysis
 
+[![DOI](https://zenodo.org/badge/670291996.svg)](https://zenodo.org/doi/10.5281/zenodo.10213905)
+
 This README describes how to evaluate the artifact for the paper: 
 "Recurrence Analysis for Automatic Parallelization of Subscripted Subscripts" submitted to
 the ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming (PPoPP) 2024.
@@ -58,9 +60,10 @@ Note:
  - ~2.5GB of disk space
 
 ## Obtaining the Codes
-1. The codes can be obtained from the Zenodo repository using the DOI
-   provided in the artifact appendix of the paper. A zipped folder is downloaded. 
-   Unzip the folder and place it in the root directory of your system.
+1. The codes can be obtained from the Zenodo repository using the DOI -
+   [![DOI](https://zenodo.org/badge/670291996.svg)](https://zenodo.org/doi/10.5281/zenodo.10213905)
+   
+   A zipped folder is downloaded.Unzip the folder and place it in the root directory of your system.
 
 2. A docker image of the artifact is also available. 
 
