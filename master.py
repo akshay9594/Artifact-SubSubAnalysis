@@ -37,7 +37,7 @@ input_matrix_dict = {'gsm_106857':'https://suitesparse-collection-website.heroku
 # #Tar files of the matrices are download. The matrix is extracted and
 # # then the tar file is deleted.
 
-print("(a)  Step 1:  Downloading and installing the required inputs and dependencies...")
+print("(a)  Step 1:  Downloading the required inputs ...")
 
 for matrix in input_matrix_dict.keys():
     download_url = input_matrix_dict[matrix]
@@ -83,7 +83,7 @@ elif(val == '3'):
 
     print("\n--------------------------------------------------------------------------\n")
 
-    print("\n\nRunning Experiment 2...")
+    print("\nRunning Experiment 2...")
     Exp2_Script.RunExp(root)
     print("\nExperiment finished! Results written to the Reports directory and Graphs to the Graphs directory!!")
 
