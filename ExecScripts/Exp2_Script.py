@@ -609,7 +609,7 @@ def drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_ben
 #Run the main experiment
 def RunExp(root_directory):
 
-    iters =  1
+    iters =  3
 
     Exp2_directory = root_directory + '/Experiment_2/'
 
@@ -621,20 +621,17 @@ def RunExp(root_directory):
     #Benchmarks in a dictionary. They are grouped according to the suite they belong.
     #Grouping helps in seamleass compilation and execution.
     benchmarks_dict = {'poly':['fdtd-2d','heat-3d', 'gramschmidt', 'syrk'],
-                        'NAS':['CG', 'MG', 'UA', 'IS'], 'Other':['SDDMM','ic0_csc','amgmk','SuiteSparse']}
-  
-    benchmarks_dict = {'Other':['SuiteSparse']}
-
+                        'NAS':['CG', 'MG', 'UA', 'IS'], 'Other':['SuiteSparse','SDDMM','ic0_csc','amgmk']}
 
     benchmark_tags = list(benchmarks_dict.keys())
 
     for tag in benchmark_tags:
         list_benchmarks = benchmarks_dict[tag]
-        # if(tag == 'poly'):
-        #     drive_poly(Exp2_directory,root_directory,path_to_reports_dir,list_benchmarks)
+        if(tag == 'poly'):
+            drive_poly(Exp2_directory,root_directory,path_to_reports_dir,list_benchmarks)
 
-        # if(tag == 'NAS'):
-        #     drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
+        if(tag == 'NAS'):
+            drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
 
         if(tag == 'Other'):
             drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)

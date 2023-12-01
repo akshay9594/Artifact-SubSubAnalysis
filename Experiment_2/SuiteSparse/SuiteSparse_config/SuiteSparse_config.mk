@@ -161,7 +161,7 @@ SUITESPARSE_VERSION = 5.4.0
     # performance.  This script can also detect if the Intel MKL BLAS is
     # installed.
 
-    LAPACK ?= /home/akshay/Artifact-SubSubAnalysis/BLAS_and_LAPACK/liblapack.a
+    LAPACK ?= ~/Artifact-SubSubAnalysis/BLAS_and_LAPACK/liblapack.a
 
     ifndef BLAS
         ifdef MKLROOT
@@ -177,7 +177,7 @@ SUITESPARSE_VERSION = 5.4.0
             LAPACK = 
         else
             # use the OpenBLAS at http://www.openblas.net
-            BLAS = /home/akshay/Artifact-SubSubAnalysis/BLAS_and_LAPACK/libopenblas.a -lgfortran
+            BLAS = ~/Artifact-SubSubAnalysis/BLAS_and_LAPACK/libopenblas.a -lgfortran
         endif
     endif
 
