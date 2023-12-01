@@ -76,3 +76,26 @@ def runcmd(cmd, verbose = False):
     # if verbose:
     #     print(std_out.strip(), std_err)
     pass
+
+
+def set_path_to_BLAS_LAPACK(root_path:str,suitesparse_path:str):
+
+    BLAS_PATH= root_path + '/BLAS_and_LAPACK/libopenblas.a -lgfortran'
+    LAPACK_PATH = root_path + '/BLAS_and_LAPACK/liblapack.a'
+
+    MK_SuiteSparse = suitesparse_path + '/SuiteSparse_config/SuiteSparse_config.mk'
+
+    with open(MK_SuiteSparse, 'r') as file:
+
+        mk_content = file.read()
+
+        mk_content = mk_content.replace('~/Artifact-SubSubAnalysis/BLAS_and_LAPACK/liblapack.a', LAPACK_PATH) 
+
+        mk_content = mk_content.replace('~/Artifact-SubSubAnalysis/BLAS_and_LAPACK/libopenblas.a -lgfortran', BLAS_PATH)
+
+    
+    with open(MK_SuiteSparse, 'w') as file:
+
+        file.write(mk_content)
+
+        file.close()

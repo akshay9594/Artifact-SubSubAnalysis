@@ -415,7 +415,7 @@ def run_Other_Benchmark(benchmark,Exp2_directory,iters,path_to_reports_dir,execu
 
 
 #CHOLMOD Supernodal within SuiteSparse handled separately
-def run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executable,path_to_input):
+def run_SuiteSparse(benchmark,Exp2_directory,root_directory,iters,path_to_reports_dir,executable,path_to_input):
 
     #If the user wants to run the experiment for all the input files
 
@@ -441,6 +441,7 @@ def run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executabl
     BaseTech_CetusOut_file_direc = Supernodal_path + 'BaseTech/'
     NewTech_CetusOut_file_direc = Supernodal_path + 'NewTech/'
 
+    utils.set_path_to_BLAS_LAPACK(root_directory,SuiteSparse_path)
     #Compile and run the baseline code
 
     with open(path_to_reports_dir+'/'+benchmark+'.txt', 'w') as f:
@@ -585,7 +586,9 @@ def drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_ben
             executable = 'cholmod_demo'
             input_mat = 'spal_004'
             path_to_input = os.getcwd() + '/input_matrices/' + input_mat + '/' + input_mat + '.mtx'
-            Base_Tech_speedup,New_Tech_speedup = run_SuiteSparse(benchmark,Exp2_directory,iters,path_to_reports_dir,executable,path_to_input)
+
+            Base_Tech_speedup,New_Tech_speedup = run_SuiteSparse(benchmark,Exp2_directory,root_directory,iters,
+                                                                 path_to_reports_dir,executable,path_to_input)
             benchmark_name = 'CHOLMOD\nSupernodal'
             speedup_dict[benchmark_name] = (Base_Tech_speedup,New_Tech_speedup)
             os.chdir(root_directory)
@@ -606,7 +609,7 @@ def drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_ben
 #Run the main experiment
 def RunExp(root_directory):
 
-    iters =  3
+    iters =  1
 
     Exp2_directory = root_directory + '/Experiment_2/'
 
@@ -620,16 +623,18 @@ def RunExp(root_directory):
     benchmarks_dict = {'poly':['fdtd-2d','heat-3d', 'gramschmidt', 'syrk'],
                         'NAS':['CG', 'MG', 'UA', 'IS'], 'Other':['SDDMM','ic0_csc','amgmk','SuiteSparse']}
   
+    benchmarks_dict = {'Other':['SuiteSparse']}
+
 
     benchmark_tags = list(benchmarks_dict.keys())
 
     for tag in benchmark_tags:
         list_benchmarks = benchmarks_dict[tag]
-        if(tag == 'poly'):
-            drive_poly(Exp2_directory,root_directory,path_to_reports_dir,list_benchmarks)
+        # if(tag == 'poly'):
+        #     drive_poly(Exp2_directory,root_directory,path_to_reports_dir,list_benchmarks)
 
-        if(tag == 'NAS'):
-            drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
+        # if(tag == 'NAS'):
+        #     drive_NAS(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
 
         if(tag == 'Other'):
             drive_Other(Exp2_directory,root_directory,path_to_reports_dir,iters,list_benchmarks)
