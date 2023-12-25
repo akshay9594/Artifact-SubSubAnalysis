@@ -78,10 +78,14 @@ def runcmd(cmd, verbose = False):
     pass
 
 
+#Replacing hard coded paths to BLAS and LAPACK binaries
 def set_path_to_BLAS_LAPACK(root_path:str,suitesparse_path:str):
 
     BLAS_PATH= root_path + '/BLAS_and_LAPACK/libopenblas.a -lgfortran'
     LAPACK_PATH = root_path + '/BLAS_and_LAPACK/liblapack.a'
+
+    LAPACK_Replace_String = '~/Artifact-SubSubAnalysis/BLAS_and_LAPACK/liblapack.a'
+    BLAS_Replace_String = '~/Artifact-SubSubAnalysis/BLAS_and_LAPACK/libopenblas.a -lgfortran'
 
     MK_SuiteSparse = suitesparse_path + '/SuiteSparse_config/SuiteSparse_config.mk'
 
@@ -89,9 +93,11 @@ def set_path_to_BLAS_LAPACK(root_path:str,suitesparse_path:str):
 
         mk_content = file.read()
 
-        mk_content = mk_content.replace('~/Artifact-SubSubAnalysis/BLAS_and_LAPACK/liblapack.a', LAPACK_PATH) 
+        if(BLAS_PATH not in mk_content):
+            mk_content = mk_content.replace(BLAS_Replace_String, BLAS_PATH) 
 
-        mk_content = mk_content.replace('~/Artifact-SubSubAnalysis/BLAS_and_LAPACK/libopenblas.a -lgfortran', BLAS_PATH)
+        if(LAPACK_PATH not in mk_content):
+            mk_content = mk_content.replace(LAPACK_Replace_String, LAPACK_PATH)
 
     
     with open(MK_SuiteSparse, 'w') as file:
